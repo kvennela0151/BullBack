@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Your existing colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <!-- Add these for consistency -->
+    <color name="primary">#0F4CFF</color>
+    <color name="primary_variant">#0A3ACC</color>
+    <color name="secondary">#00D4AA</color>
+    <color name="button_green">#C8E6C9</color>
+    <color name="button_green_dark">#A5D6A7</color>
+
+    <!-- Background & Surface -->
+    <color name="background">#FFFFFF</color>
+    <color name="surface">#FFFFFF</color>
+
+    <!-- Semantic Colors -->
+    <color name="error">#FF3B30</color>
+    <color name="success">#34C759</color>
+    <color name="warning">#FF9500</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_disabled">#C7C7CC</color>
+
+    <!-- UI Elements -->
+    <color name="border">#E5E5EA</color>
+    <color name="divider">#F2F2F7</color>
+
+    <color name="green">#4CAF50</color>
+    <color name="red">#F44336</color>
+    <color name="light_gray">#E0E0E0</color>
+</resources>
