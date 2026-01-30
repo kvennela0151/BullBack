@@ -1,60 +1,102 @@
 package com.example.bullback.ui.profile
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.bullback.R
+import com.example.bullback.data.model.auth.User
+import com.example.bullback.databinding.FragmentProfileBinding
+import com.example.bullback.ui.profile.marginSettings.MarginSettingsFragment
+import com.example.bullback.ui.profile.wallet.WalletFragment
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ProfileFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class ProfileFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var binding: FragmentProfileBinding
+    private val viewModel: ProfileViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding = FragmentProfileBinding.bind(view)
+
+        // Load profile data
+        viewModel.loadProfile()
+
+        //Wallet Screen navigation
+        binding.option1.setOnClickListener{
+            navigateToFragment(WalletFragment())
+        }
+
+        // Margin Settings navigation
+        binding.option3.setOnClickListener {
+            navigateToFragment(MarginSettingsFragment())
+        }
+
+        observeState()
+    }
+
+    private fun observeState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(
+                androidx.lifecycle.Lifecycle.State.STARTED
+            ) {
+                viewModel.state.collect { state ->
+
+                    // Error handling
+                    state.error?.let {
+                        Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                        viewModel.clearError()
+                    }
+
+                    // Profile data
+                    state.user?.let { userResponse ->
+                        val user = User(
+                            id = userResponse.id,
+                            username = userResponse.username,
+                            email = userResponse.email,
+                            createdAt = userResponse.createdAt
+                        )
+                        bindUserData(user)
+                    }
+                }
+            }
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false)
+    private fun bindUserData(user: User) {
+        binding.tvUsername.text = user.username
+        binding.tvInitial.text = user.username.firstOrNull()?.toString() ?: "?"
+
+        binding.tvMemberSince.text =
+            "Member since ${formatDate(user.createdAt)}"
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ProfileFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ProfileFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    private fun formatDate(date: String?): String {
+        if (date.isNullOrEmpty()) return "N/A"
+
+        return try {
+            val input = SimpleDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss",
+                Locale.getDefault()
+            )
+            val output = SimpleDateFormat("MMM yyyy", Locale.getDefault())
+            output.format(input.parse(date)!!)
+        } catch (e: Exception) {
+            "N/A"
+        }
+    }
+
+    private fun navigateToFragment(fragment: Fragment) {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 }

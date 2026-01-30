@@ -9,8 +9,11 @@ data class CommodityResponse(
 )
 
 data class CommodityData(
+
+    val token: String? = null,
+
     @SerializedName("instrument_token")
-    val instrumentToken: Long,
+    val instrumentToken: String,
 
     @SerializedName("exchange_token")
     val exchangeToken: String,
@@ -21,7 +24,7 @@ data class CommodityData(
     val name: String,
 
     @SerializedName("last_price")
-    val lastPrice: Double,
+    var lastPrice: Double,
 
     val expiry: String,
     val strike: Double,
@@ -36,7 +39,9 @@ data class CommodityData(
     val instrumentType: String,
 
     val segment: String,
-    val exchange: String
+    val exchange: String,
+    var change: Double,
+    var changePercent: Double
 ) {
     // Helper properties for display
     val displayName: String
@@ -46,9 +51,5 @@ data class CommodityData(
         get() = lastPrice
 
     // Using dummy calculation for demonstration
-    val change: Double
-        get() = 0.0 // Replace with actual calculation
 
-    val changePercent: Double
-        get() = 0.0 // Replace with actual calculation
 }

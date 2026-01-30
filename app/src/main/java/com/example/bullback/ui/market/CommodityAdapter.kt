@@ -10,14 +10,16 @@ import com.example.bullback.R
 import com.example.bullback.data.model.auth.CommodityData
 
 
-class CommodityAdapter(private var commodities: List<CommodityData>) :
-    RecyclerView.Adapter<CommodityAdapter.CommodityViewHolder>() {
+
+class CommodityAdapter(
+    private var commodities: List<CommodityData>
+) : RecyclerView.Adapter<CommodityAdapter.CommodityViewHolder>() {
 
     class CommodityViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvCommodityName: TextView = view.findViewById(R.id.tvCommodityName)
-        val tvCommodityPrice: TextView = view.findViewById(R.id.tvCommodityPrice)
-        val tvCommodityChange: TextView = view.findViewById(R.id.tvCommodityChange)
-        val tvCommodityChangePercent: TextView = view.findViewById(R.id.tvCommodityChangePercent)
+        val name: TextView = view.findViewById(R.id.tvCommodityName)
+        val price: TextView = view.findViewById(R.id.tvCommodityPrice)
+        val change: TextView = view.findViewById(R.id.tvCommodityChange)
+        val percent: TextView = view.findViewById(R.id.tvCommodityChangePercent)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommodityViewHolder {
@@ -27,48 +29,49 @@ class CommodityAdapter(private var commodities: List<CommodityData>) :
     }
 
     override fun onBindViewHolder(holder: CommodityViewHolder, position: Int) {
-        val commodity = commodities[position]
+        val item = commodities[position]
 
-        // Display commodity name (e.g., "GOLD")
-        holder.tvCommodityName.text = commodity.name
+        holder.name.text = item.name
+        holder.price.text =
+            if (item.lastPrice > 0) String.format("%.2f", item.lastPrice) else "--"
 
-        // Display last price
-        holder.tvCommodityPrice.text = if (commodity.lastPrice > 0) {
-            String.format("%.2f", commodity.lastPrice)
-        } else {
-            "N/A"
-        }
+        holder.change.text =
+            if (item.change >= 0) "+%.2f".format(item.change) else "%.2f".format(item.change)
 
-        // Format change with + or - sign
-        val changeText = if (commodity.change >= 0) {
-            "+${String.format("%.2f", commodity.change)}"
-        } else {
-            String.format("%.2f", commodity.change)
-        }
-        holder.tvCommodityChange.text = changeText
+        holder.percent.text =
+            if (item.changePercent >= 0)
+                "+%.2f%%".format(item.changePercent)
+            else
+                "%.2f%%".format(item.changePercent)
 
-        // Format percentage
-        val percentText = if (commodity.changePercent >= 0) {
-            "+${String.format("%.2f", commodity.changePercent)}%"
-        } else {
-            "${String.format("%.2f", commodity.changePercent)}%"
-        }
-        holder.tvCommodityChangePercent.text = percentText
+        val color =
+            if (item.change >= 0) Color.parseColor("#2E7D32")
+            else Color.parseColor("#C62828")
 
-        // Set color based on positive or negative change
-        val color = if (commodity.change >= 0) {
-            Color.parseColor("#4CAF50") // Green
-        } else {
-            Color.parseColor("#F44336") // Red
-        }
-        holder.tvCommodityChange.setTextColor(color)
-        holder.tvCommodityChangePercent.setTextColor(color)
+        holder.change.setTextColor(color)
+        holder.percent.setTextColor(color)
     }
 
-    override fun getItemCount() = commodities.size
+    override fun getItemCount(): Int = commodities.size
 
-    fun updateData(newCommodities: List<CommodityData>) {
-        commodities = newCommodities
+    fun updateData(newList: List<CommodityData>) {
+        commodities = newList
         notifyDataSetChanged()
+    }
+
+    fun updateLivePrice(token: String, ltp: Double, change: Double,
+                        changePercent: Double) {
+        val index = commodities.indexOfFirst {
+            it.instrumentToken == token
+        }
+
+        if (index == -1) return
+
+        val item = commodities[index]
+        item.lastPrice = ltp
+        item.change = change
+        item.changePercent = changePercent
+
+        notifyItemChanged(index)
     }
 }

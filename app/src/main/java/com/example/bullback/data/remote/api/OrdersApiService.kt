@@ -7,6 +7,6 @@ import retrofit2.http.Query
 interface OrdersApiService {
     @GET("/api/v1/trade/orders")
     suspend fun getOrders(
-        @Query("status") status: String? = null
+        @Query("type") type: String? = null // "OPEN", "EXECUTED", "REJECTED"
     ): OrdersResponse
 }

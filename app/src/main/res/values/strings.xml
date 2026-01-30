@@ -28,4 +28,5 @@
     <!-- Navigation -->
     <string name="market">Market</string>
     <string name="empty_open_orders">empty open oders\n</string>
+    <string name="click_to_upload_or_drag_drop"><![CDATA[Click to upload or drag & drop]]></string>
 </resources>

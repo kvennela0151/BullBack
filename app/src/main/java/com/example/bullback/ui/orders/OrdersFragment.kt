@@ -7,15 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.bullback.MainActivity
-import com.example.bullback.R
 import com.example.bullback.data.model.auth.Order
-import com.example.bullback.data.model.auth.OrderStatus
 import com.example.bullback.databinding.FragmentOrdersBinding
+import com.example.bullback.utlis.Resource
 import com.google.android.material.tabs.TabLayout
-import kotlinx.coroutines.launch
 
 
 class OrdersFragment : Fragment() {
@@ -38,15 +34,38 @@ class OrdersFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupTabs()
         setupRecyclerView()
-        setupTabLayout()
         observeViewModel()
-        loadOrders()
+    }
+
+    private fun setupTabs() {
+        binding.tabLayout.apply {
+            addTab(newTab().setText("Open"))
+            addTab(newTab().setText("Executed"))
+            addTab(newTab().setText("Rejected"))
+
+            //load orders
+            addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    when(tab?.position){
+                        0 -> viewModel.loadOrdersByType("OPEN")
+                        1 -> viewModel.loadOrdersByType("EXECUTED")
+                        2 -> viewModel.loadOrdersByType("REJECTED")
+                    }
+                }
+                override fun onTabUnselected(tab: TabLayout.Tab?) {}
+                override fun onTabReselected(tab: TabLayout.Tab?) {}
+            })
+        }
+
+        // Load default tab (OPEN)
+        viewModel.loadOrdersByType("OPEN")
     }
 
     private fun setupRecyclerView() {
         ordersAdapter = OrdersAdapter { order ->
-            showOrderClickFeedback(order)
+            onOrderClicked(order)
         }
 
         binding.rvOrders.apply {
@@ -56,57 +75,28 @@ class OrdersFragment : Fragment() {
         }
     }
 
-    private fun setupTabLayout() {
-        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                when (tab?.position) {
-                    0 -> viewModel.onTabSelected(OrderStatus.OPEN)
-                    1 -> viewModel.onTabSelected(OrderStatus.EXECUTED)
-                    2 -> viewModel.onTabSelected(OrderStatus.REJECTED)
-                }
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
-        })
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.selectedTab.observe(viewLifecycleOwner) { status ->
-                updateTabSelection(status)
-            }
-        }
-    }
-
-    private fun updateTabSelection(status: OrderStatus) {
-        when (status) {
-            OrderStatus.OPEN -> binding.tabLayout.selectTab(binding.tabLayout.getTabAt(0))
-            OrderStatus.EXECUTED -> binding.tabLayout.selectTab(binding.tabLayout.getTabAt(1))
-            OrderStatus.REJECTED -> binding.tabLayout.selectTab(binding.tabLayout.getTabAt(2))
-        }
-    }
-
-
     private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.orders.observe(viewLifecycleOwner) { resource ->
-            }
+
+        // Observe OPEN orders list
+        viewModel.filteredOrders.observe(viewLifecycleOwner) { orders ->
+            ordersAdapter.submitList(orders)
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.filteredOrders.observe(viewLifecycleOwner) { orders ->
-                ordersAdapter.submitList(orders)
+        viewModel.orders.observe(viewLifecycleOwner) { resource ->
+            if (resource is Resource.Error) {
+                Toast.makeText(
+                    requireContext(),
+                    resource.message,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
-    private fun loadOrders() {
-        viewModel.loadOrders()
-    }
-
-    private fun showOrderClickFeedback(order: Order) {
+    private fun onOrderClicked(order: Order) {
         Toast.makeText(
             requireContext(),
-            "${order.symbol} - ${order.transactionType} (${order.status})",
+            "${order.symbol} - ${order.status}",
             Toast.LENGTH_SHORT
         ).show()
     }

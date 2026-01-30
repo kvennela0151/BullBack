@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bullback.data.model.auth.Order
-import com.example.bullback.data.model.auth.OrderStatus
 import com.example.bullback.data.repository.OrdersRepository
 import com.example.bullback.utlis.Resource
 import kotlinx.coroutines.launch
@@ -19,48 +18,25 @@ class OrdersViewModel(
     private val _filteredOrders = MutableLiveData<List<Order>>()
     val filteredOrders: LiveData<List<Order>> = _filteredOrders
 
-    private val _selectedTab = MutableLiveData<OrderStatus>(OrderStatus.OPEN)
-    val selectedTab: LiveData<OrderStatus> = _selectedTab
-
-    private var allOrders: List<Order> = emptyList()
-
     init {
-        loadOrders()
+        loadOrdersByType("OPEN")
     }
 
-    fun loadOrders() {
+    fun loadOrdersByType(type: String) {
         viewModelScope.launch {
             _orders.value = Resource.Loading()
 
-            when (val result = repository.getOrders()) {
+            when (val result = repository.getOrders(type)) {
                 is Resource.Success -> {
-                    _orders.value = result
-                    allOrders = result.data
-                    filterOrders(_selectedTab.value ?: OrderStatus.OPEN)
+                    _orders.value = result as Resource<List<Order>>
+                    _filteredOrders.value = result.data // show in adapter
                 }
                 is Resource.Error -> {
                     _orders.value = result
                     _filteredOrders.value = emptyList()
                 }
-                is Resource.Loading -> {
-                    _orders.value = result
-                }
+                is Resource.Loading -> _orders.value = result
             }
         }
-    }
-
-    fun onTabSelected(status: OrderStatus) {
-        _selectedTab.value = status
-        filterOrders(status)
-    }
-
-    private fun filterOrders(status: OrderStatus) {
-        val filtered = repository.filterOrdersByStatus(allOrders, status)
-        _filteredOrders.value = filtered
-    }
-
-
-    fun refreshOrders() {
-        loadOrders()
     }
 }

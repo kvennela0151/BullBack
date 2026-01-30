@@ -1,10 +1,12 @@
 package com.example.bullback.data.remote.api
 
+import com.example.bullback.data.model.auth.ApiResponse
 import com.example.bullback.data.model.auth.CheckUsernameResponse
 import com.example.bullback.data.model.auth.CommodityResponse
 import com.example.bullback.data.model.auth.LoginResponse
 import com.example.bullback.data.model.auth.SignupResponse
 import com.example.bullback.data.model.auth.User
+import com.example.bullback.data.model.auth.UserMeResponse
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.GET
@@ -43,8 +45,7 @@ interface AuthApi {
     @GET("/api/v1/users/check-username")
     suspend fun checkUsername(@Query("username") username: String): Response<CheckUsernameResponse>
 
-    //profile (check authentication)
     @GET("api/v1/users/me")
-    suspend fun getProfile(): Response<User>
+    suspend fun getProfile(): Response<ApiResponse<UserMeResponse>>
 
 }

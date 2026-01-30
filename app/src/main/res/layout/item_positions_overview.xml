@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="12dp">
+
+    <!-- Symbol -->
+    <TextView
+        android:id="@+id/tvSymbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NIFTY26JANFUT"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Segment -->
+    <TextView
+        android:id="@+id/tvSegment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NFO"
+        android:textSize="12sp"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="2dp"
+        android:background="@drawable/bg_badge_gray"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/tvSymbol"
+        app:layout_constraintTop_toTopOf="@id/tvSymbol"/>
+
+    <!-- PNL -->
+    <TextView
+        android:id="@+id/tvPnl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="-708.50"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvSymbol"/>
+
+    <!-- Buy Badge -->
+    <TextView
+        android:id="@+id/tvBuyBadge"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:text="B"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:background="@drawable/bg_circle_green"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/tvSymbol"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <!-- Quantity x Price -->
+    <TextView
+        android:id="@+id/tvQtyPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="65 x 25,784.90"
+        android:textColor="@android:color/black"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/tvBuyBadge"
+        app:layout_constraintTop_toTopOf="@id/tvBuyBadge"/>
+
+    <!-- LTP -->
+    <TextView
+        android:id="@+id/tvLtp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LTP: 25,774.00"
+        android:textColor="@android:color/darker_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvPnl"/>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="#EEEEEE"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/tvBuyBadge"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

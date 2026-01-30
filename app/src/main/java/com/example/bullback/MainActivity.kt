@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.bullback.data.model.websocket.AppWebSocketManager
 import com.example.bullback.databinding.ActivityMainBinding
 import com.example.bullback.ui.login.LoginFragment
 import com.example.bullback.ui.market.MarketFragment
@@ -12,6 +13,8 @@ import com.example.bullback.ui.positions.PositionsFragment
 import com.example.bullback.ui.profile.ProfileFragment
 import com.example.bullback.ui.signup.SignupFragment
 import com.example.bullback.ui.watchlist.WatchlistFragment
+import com.example.bullback.data.repository.AuthRepository
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,19 +26,18 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Hide bottom nav initially (Login / Signup)
+        // Hide bottom nav initially
         showBottomNav(false)
 
-        // Load Login screen on app start
         if (savedInstanceState == null) {
             loadFragment(LoginFragment(), clearBackStack = true)
         }
 
-        // Bottom Navigation click handling
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
 
                 R.id.nav_market -> {
+                    startMarketWebSocket()
                     loadFragment(MarketFragment())
                     true
                 }
@@ -80,10 +82,20 @@ class MainActivity : AppCompatActivity() {
     fun navigateToMainScreen() {
         showBottomNav(true)
         binding.bottomNavigation.selectedItemId = R.id.nav_market
+        startMarketWebSocket()
         loadFragment(MarketFragment(), clearBackStack = true)
     }
 
-    /* ------------------ Core Fragment Loader ------------------ */
+    /* ------------------ WebSocket Start ------------------ */
+
+    private fun startMarketWebSocket() {
+        val token = AuthRepository.getInstance(this).getTokenSync()
+        if (!token.isNullOrEmpty()) {
+            AppWebSocketManager.connect(token)
+        }
+    }
+
+    /* ------------------ Fragment Loader ------------------ */
 
     private fun loadFragment(
         fragment: Fragment,
@@ -101,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    /* ------------------ Bottom Nav Visibility ------------------ */
+    /* ------------------ Bottom Nav ------------------ */
 
     fun showBottomNav(show: Boolean) {
         binding.bottomNavigation.visibility =

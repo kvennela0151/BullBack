@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="14dp"
+    android:paddingHorizontal="12dp">
+
+    <!-- Checkbox (Delete Mode) -->
+    <CheckBox
+        android:id="@+id/cbSelectAll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+    <!-- Symbol -->
+    <TextView
+        android:id="@+id/tvSymbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NIFTY26FEBFUT"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toEndOf="@id/cbSelectAll"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="8dp"/>
+
+    <!-- Tag -->
+    <TextView
+        android:id="@+id/tvTag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NFO"
+        android:textSize="12sp"
+        android:background="@drawable/bg_chip"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        app:layout_constraintStart_toEndOf="@id/tvSymbol"
+        app:layout_constraintTop_toTopOf="@id/tvSymbol"
+        android:layout_marginStart="8dp"/>
+
+    <!-- Date / Segment -->
+    <TextView
+        android:id="@+id/tvData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="24 Feb"
+        android:textColor="#808080"
+        app:layout_constraintStart_toStartOf="@id/tvSymbol"
+        app:layout_constraintTop_toBottomOf="@id/tvSymbol"/>
+
+    <!-- LTP -->
+    <TextView
+        android:id="@+id/tvLtp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LTP : 55,916.00"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Price -->
+    <TextView
+        android:id="@+id/tvPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="25,913.20"
+        android:textColor="#C62828"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvLtp"/>
+
+    <!-- Change -->
+    <TextView
+        android:id="@+id/tvChange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="-101.50  -0.39%"
+        android:textColor="#C62828"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvPrice"/>
+
+    <!-- Close Price -->
+    <TextView
+        android:id="@+id/tvClosePrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Close: 25,912.00"
+        android:textColor="#808080"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvChange"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

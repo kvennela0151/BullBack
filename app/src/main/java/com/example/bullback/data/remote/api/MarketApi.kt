@@ -12,4 +12,5 @@ interface MarketApi {
     suspend fun getTopCommodities(
         @Header("Authorization") authorization: String
     ): Response<CommodityResponse>
+
 }

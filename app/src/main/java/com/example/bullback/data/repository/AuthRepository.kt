@@ -1,19 +1,20 @@
 package com.example.bullback.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.example.bullback.data.model.auth.*
+import com.example.bullback.data.model.watchlist.WatchlistResponse
+import com.example.bullback.data.remote.RetrofitClient
 import com.example.bullback.data.remote.api.AuthApi
+import com.example.bullback.data.remote.api.MarketApi
+import com.example.bullback.data.remote.api.WatchlistApiService
 import com.example.bullback.utlis.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import retrofit2.Response
-import android.util.Log
-import com.example.bullback.data.remote.RetrofitClient
-import com.example.bullback.data.remote.api.MarketApi
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
-
+import retrofit2.Response
 
 class AuthRepository private constructor(
     private val context: Context
@@ -30,16 +31,13 @@ class AuthRepository private constructor(
         RetrofitClient.createService(MarketApi::class.java)
     }
 
-
     private fun String.toFormData() =
         toRequestBody("text/plain".toMediaTypeOrNull())
 
     private fun String?.toOptionalFormData() =
         this?.toFormData()
 
-    /* ---------------------------------------------------
-       LOGIN
-    --------------------------------------------------- */
+    /* ---------------- LOGIN ---------------- */
 
     suspend fun login(username: String, password: String): Resource<LoginResponse> {
         return try {
@@ -53,12 +51,9 @@ class AuthRepository private constructor(
 
                 if (result is Resource.Success) {
                     val token = result.data.accessToken.trim()
-
                     if (token.isNotEmpty()) {
-                        //  Clear old token before saving new
                         tokenRepository.clearToken()
                         tokenRepository.saveToken(token)
-
                         Log.d("AuthRepository", "✅ New token saved: ${token.take(30)}")
                     }
                 }
@@ -71,10 +66,7 @@ class AuthRepository private constructor(
         }
     }
 
-
-    /* ---------------------------------------------------
-       SIGNUP
-    --------------------------------------------------- */
+    /* ---------------- SIGNUP ---------------- */
 
     suspend fun signup(
         fullName: String,
@@ -94,7 +86,6 @@ class AuthRepository private constructor(
                     password = password.toFormData(),
                     referralCode = referralCode.toOptionalFormData()
                 )
-
                 handleResponse(response)
             }
         } catch (e: Exception) {
@@ -103,9 +94,7 @@ class AuthRepository private constructor(
         }
     }
 
-    /* ---------------------------------------------------
-       CHECK USERNAME
-    --------------------------------------------------- */
+    /* ---------------- CHECK USERNAME ---------------- */
 
     suspend fun checkUsername(username: String): Resource<CheckUsernameResponse> {
         return try {
@@ -119,9 +108,7 @@ class AuthRepository private constructor(
         }
     }
 
-    /* ---------------------------------------------------
-       DEMO LOGIN
-    --------------------------------------------------- */
+    /* ---------------- DEMO LOGIN ---------------- */
 
     suspend fun demoLogin(): Resource<LoginResponse> {
         return try {
@@ -133,7 +120,6 @@ class AuthRepository private constructor(
                     val rawToken = result.data.accessToken
                         .removePrefix("Bearer ")
                         .trim()
-
                     tokenRepository.saveToken(rawToken)
                 }
 
@@ -145,39 +131,14 @@ class AuthRepository private constructor(
         }
     }
 
-    /* ---------------------------------------------------
-       USER PROFILE
-    --------------------------------------------------- */
-
-    suspend fun getProfile(): Resource<User> {
-        return try {
-            withContext(Dispatchers.IO) {
-                val response = authApi.getProfile()
-                handleResponse(response)
-            }
-        } catch (e: Exception) {
-            Log.e("AuthRepository", "Profile error", e)
-            Resource.Error("Failed to load profile")
-        }
-    }
-
-    /* ---------------------------------------------------
-       TOP COMMODITIES
-    --------------------------------------------------- */
+    /* ---------------- TOP COMMODITIES ---------------- */
 
     suspend fun getTopCommodities(): Resource<List<CommodityData>> {
         return try {
             withContext(Dispatchers.IO) {
-
                 val token = tokenRepository.getToken()
-
-                if (token.isNullOrEmpty()) {
-                    return@withContext Resource.Error("Token not found")
-                }
-
+                if (token.isNullOrEmpty()) return@withContext Resource.Error("Token not found")
                 val authHeader = "Bearer $token"
-
-                Log.d("MARKET_API", "Using header: ${authHeader.take(30)}...")
 
                 val response = marketApi.getTopCommodities(authHeader)
 
@@ -198,11 +159,38 @@ class AuthRepository private constructor(
         }
     }
 
+    //watchlist
+    suspend fun getWatchlist(): WatchlistResponse {
+        val token = getTokenSync() ?: ""
+        val api = RetrofitClient.createService(WatchlistApiService::class.java)
+        val response = api.getWatchlist() // Retrofit call
+        if (response.isSuccessful && response.body() != null) {
+            return response.body()!!
+        } else {
+            throw Exception("Failed to fetch watchlist")
+        }
+    }
 
 
-    /* ---------------------------------------------------
-       RESPONSE HANDLER
-    --------------------------------------------------- */
+    suspend fun getProfile(): Resource<UserMeResponse> {
+        return try {
+            val response = authApi.getProfile()
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null && body.status) {
+                    Resource.Success(body.data)
+                } else {
+                    Resource.Error(body?.message ?: "Unknown error")
+                }
+            } else {
+                Resource.Error("Failed to load profile")
+            }
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Network error")
+        }
+    }
+
+    /* ---------------- RESPONSE HANDLER ---------------- */
 
     private suspend fun <T> handleResponse(
         response: Response<T>
@@ -213,12 +201,7 @@ class AuthRepository private constructor(
                     Resource.Success(it)
                 } ?: Resource.Error("Empty response")
             } else {
-                val code = response.code()
-
-                if (code == 401) {
-                    tokenRepository.clearToken()
-                }
-
+                if (response.code() == 401) tokenRepository.clearToken()
                 Resource.Error("Error ${response.code()}")
             }
         } catch (e: Exception) {
@@ -227,26 +210,14 @@ class AuthRepository private constructor(
         }
     }
 
-    /* ---------------------------------------------------
-       TOKEN HELPERS
-    --------------------------------------------------- */
+    /* ---------------- TOKEN HELPERS ---------------- */
 
-    suspend fun getToken(): String? =
-        tokenRepository.getToken()
+    suspend fun getToken(): String? = tokenRepository.getToken()
+    fun getTokenSync(): String? = runBlocking { tokenRepository.getToken() }
+    suspend fun hasToken(): Boolean = tokenRepository.hasToken()
+    fun hasTokenSync(): Boolean = runBlocking { tokenRepository.hasToken() }
 
-    fun getTokenSync(): String? =
-        runBlocking { tokenRepository.getToken() }
-
-    suspend fun hasToken(): Boolean =
-        tokenRepository.hasToken()
-
-    fun hasTokenSync(): Boolean =
-        runBlocking { tokenRepository.hasToken() }
-
-
-    /* ---------------------------------------------------
-       SINGLETON
-    --------------------------------------------------- */
+    /* ---------------- SINGLETON ---------------- */
 
     companion object {
         @Volatile
@@ -255,7 +226,6 @@ class AuthRepository private constructor(
         fun getInstance(context: Context): AuthRepository {
             return INSTANCE ?: synchronized(this) {
                 val instance = AuthRepository(context.applicationContext)
-                // Initialize RetrofitClient with token repository
                 RetrofitClient.setTokenRepository(instance.tokenRepository)
                 INSTANCE = instance
                 instance
