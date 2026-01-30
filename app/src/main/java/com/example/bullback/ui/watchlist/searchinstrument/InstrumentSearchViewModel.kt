@@ -46,30 +46,34 @@ class InstrumentSearchViewModel(
     }
 
     /* ---------------- ADD INSTRUMENT ---------------- */
-    fun addInstrument(item: SearchInstrument) {
+    fun addInstrument(request: AddWatchlistRequest) {
         viewModelScope.launch {
             _addState.value = Resource.Loading()
 
-            val request = AddWatchlistRequest(
-                exchange = item.exchange,
-                expiryDate = item.expiryDate,
-                instrumentType = item.instrumentType,
-                lotSize = item.lotSize,
-                script = item.script,
-                segment = item.segment,
-                strike = item.strike,
-                symbol = item.symbol,
-                token = item.instrumentToken?.toString() ?: ""
-            )
+            try {
+                println("DEBUG: Adding instrument with request: $request")
 
-            _addState.value = watchlistRepository.addInstrument(request)
+                val result = watchlistRepository.addInstrument(request)
+                _addState.value = result
 
-            if (_addState.value is Resource.Success) {
-                // Update the list immutably so adapter sees the change
-                _results.value = _results.value.map {
-                    if (it.symbol == item.symbol) it.copy(isAdded = true)
-                    else it
+                // If successful, update the search results to mark as added
+                if (result is Resource.Success) {
+                    println("DEBUG: Add successful, updating UI")
+                    _results.value = _results.value.map { item ->
+                        // Match by trading symbol
+                        if (item.tradingsymbol == request.symbol) {
+                            item.copy(isAdded = true)
+                        } else {
+                            item
+                        }
+                    }
+                } else if (result is Resource.Error) {
+                    println("DEBUG: Add failed: ${result.message}")
                 }
+            } catch (e: Exception) {
+                println("DEBUG: Exception during add: ${e.message}")
+                e.printStackTrace()
+                _addState.value = Resource.Error(e.message ?: "Failed to add instrument")
             }
         }
     }

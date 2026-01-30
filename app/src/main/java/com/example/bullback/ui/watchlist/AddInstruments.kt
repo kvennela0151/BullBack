@@ -64,9 +64,10 @@ class AddInstruments : Fragment() {
         viewModel = ViewModelProvider(this, factory)[InstrumentSearchViewModel::class.java]
     }
 
+    // In AddInstruments.kt
     private fun setupRecyclerView() {
-        adapter = InstrumentSearchAdapter { instrument ->
-            viewModel.addInstrument(instrument) // call ViewModel to add
+        adapter = InstrumentSearchAdapter(segment) { request ->
+            viewModel.addInstrument(request) // Pass AddWatchlistRequest
         }
 
         binding.rvInstruments.layoutManager = LinearLayoutManager(requireContext())

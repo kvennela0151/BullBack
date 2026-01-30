@@ -6,5 +6,5 @@ data class WatchlistResponse(
 
     val status: Boolean,
     val message: String,
-    val data: List<WatchlistData>   // ✅ LIST
+    val data: List<WatchlistData>   // LIST
 )

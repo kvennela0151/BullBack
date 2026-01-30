@@ -6,24 +6,31 @@ data class WatchlistSymbol(
 
     val script: String,
     val symbol: String,
-    val token: String,
+    val token: String = "",
+
+    @SerializedName("instrument_token")
+    val instrumentToken: String? = null, // nullable
 
     @SerializedName("instrument_type")
-    val instrumentType: String,
+    val instrumentType: String = "",
 
-    val segment: String,
-    val exchange: String,
+    val segment: String = "",
+    val exchange: String = "",
 
     @SerializedName("expiry_date")
-    val expiryDate: String,
+    val expiryDate: String = "",
 
     @SerializedName("lot_size")
-    val lotSize: Int,
-    val strike: Double,
+    val lotSize: Int = 0,
+    val strike: Double = 0.0,
 
-    var lastPrice: Double,
-    var change: Double,
+    var lastPrice: Double = 0.0,
+    var change: Double = 0.0,
 
-    var changePercent: Double,
-    var closePrice: Double
+    var changePercent: Double = 0.0,
+    var closePrice: Double = 0.0,
+    val bid: Double? = null,
+    val ask: Double? = null
+
 )
+

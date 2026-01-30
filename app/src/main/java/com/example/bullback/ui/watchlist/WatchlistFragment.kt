@@ -1,6 +1,7 @@
 package com.example.bullback.ui.watchlist
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -68,11 +69,11 @@ class WatchlistFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = WatchlistAdapter { symbol, segment, ltp ->
-            // Show bottom sheet on item click
-            val bottomSheet = WatchlistSymbolBottomSheet(symbol, segment, ltp)
+        adapter = WatchlistAdapter { symbol, segment, token, ltp ->
+            val bottomSheet = WatchlistSymbolBottomSheet(symbol, segment, token, ltp)
             bottomSheet.show(parentFragmentManager, "WatchlistSymbolBottomSheet")
         }
+
         binding.recyclerWatchlist.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerWatchlist.adapter = adapter
     }
@@ -183,37 +184,58 @@ class WatchlistFragment : Fragment() {
         AppWebSocketManager.sendMessage(message.toString())
     }
 
+    // Update the onStart() method
     override fun onStart() {
         super.onStart()
         val token = authRepository.getTokenSync()
         token?.let { AppWebSocketManager.connect(it) }
 
+        // Update the WatchlistFragment's WebSocket listener
         AppWebSocketManager.setMarketListener { json ->
             if (json.optString("type") != "market_data") return@setMarketListener
             val data = json.optJSONObject("data") ?: return@setMarketListener
 
-            val token: String
-            val ltp: Double
+            // Extract token/identifier based on available fields
+            val token: String?
+            val symbol: String?
+
+            if (data.has("Token")) {
+                // For index/MCX - use numeric token
+                token = data.optLong("Token").toString()
+                symbol = null
+            } else if (data.has("instrument_token")) {
+                // For crypto/comex - use instrument_token as symbol
+                token = null
+                symbol = data.optString("instrument_token")
+            } else {
+                return@setMarketListener
+            }
+
+            // Extract price data
+            val ltp: Double = data.optDouble("LTP")
             val change: Double
             val changePercent: Double
             val closePrice: Double
 
-            if (data.has("Token")) {
-                token = data.optLong("Token").toString()
-                ltp = data.optDouble("LTP")
+            if (data.has("C")) {
+                // Index/MCX format
                 closePrice = data.optDouble("C")
                 change = ltp - closePrice
                 changePercent = if (closePrice != 0.0) (change / closePrice) * 100 else 0.0
             } else {
-                token = data.optString("instrument_token")
-                ltp = data.optDouble("LTP")
+                // Crypto/comex format
                 change = data.optDouble("change")
                 changePercent = data.optDouble("change_percent")
                 closePrice = data.optDouble("close")
             }
 
             requireActivity().runOnUiThread {
-                adapter.updateLivePrice(token, ltp, change, changePercent, closePrice)
+                // Try matching by token first, then by symbol
+                if (token != null) {
+                    adapter.updateLivePrice(token, ltp, change, changePercent, closePrice)
+                } else if (symbol != null) {
+                    adapter.updateLivePriceBySymbol(symbol, ltp, change, changePercent, closePrice)
+                }
             }
         }
     }

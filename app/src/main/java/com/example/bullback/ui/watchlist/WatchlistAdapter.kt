@@ -11,7 +11,7 @@ import android.graphics.Color
 import android.view.View
 
 class WatchlistAdapter(
-    private val onItemClicked: (symbol: String, segment: String, ltp: Double) -> Unit
+    private val onItemClicked: (symbol: String, segment: String, token: String, ltp: Double) -> Unit
 ) : ListAdapter<WatchlistSymbol, WatchlistAdapter.ViewHolder>(DiffCallback()) {
 
     private val livePrices = mutableMapOf<String, WatchlistSymbol>()
@@ -61,7 +61,7 @@ class WatchlistAdapter(
                 if (isDeleteMode) {
                     binding.cbSelectAll.isChecked = !binding.cbSelectAll.isChecked
                 } else {
-                    onItemClicked(item.symbol, item.segment, item.lastPrice)
+                    onItemClicked(item.symbol, item.segment, item.token, item.lastPrice)
                 }
             }
         }
@@ -78,8 +78,16 @@ class WatchlistAdapter(
     }
 
     fun updateLivePrice(token: String, ltp: Double, change: Double, changePercent: Double, closePrice: Double) {
-        val index = currentList.indexOfFirst { it.token == token }
+        // Try exact token match first
+        var index = currentList.indexOfFirst { it.token == token }
+
+        // If not found, try instrument_token (for backward compatibility)
+        if (index == -1) {
+            index = currentList.indexOfFirst { it.instrumentToken == token }
+        }
+
         if (index == -1) return
+
         val item = currentList[index].copy(
             lastPrice = ltp,
             change = change,
@@ -87,6 +95,38 @@ class WatchlistAdapter(
             closePrice = closePrice
         )
         livePrices[token] = item
+        notifyItemChanged(index)
+    }
+
+    // Add a new method to update by symbol
+    fun updateLivePriceBySymbol(symbol: String, ltp: Double, change: Double, changePercent: Double, closePrice: Double) {
+        // Find item by script or symbol field
+        val index = currentList.indexOfFirst {
+            it.script.equals(symbol, ignoreCase = true) ||
+                    it.symbol.equals(symbol, ignoreCase = true)
+        }
+
+        if (index == -1) {
+            // Try matching instrument_token if available
+            val fallbackIndex = currentList.indexOfFirst {
+                it.instrumentToken.equals(symbol, ignoreCase = true)
+            }
+            if (fallbackIndex == -1) return
+            updateItem(fallbackIndex, ltp, change, changePercent, closePrice)
+        } else {
+            updateItem(index, ltp, change, changePercent, closePrice)
+        }
+    }
+
+    private fun updateItem(index: Int, ltp: Double, change: Double, changePercent: Double, closePrice: Double) {
+        val item = currentList[index].copy(
+            lastPrice = ltp,
+            change = change,
+            changePercent = changePercent,
+            closePrice = closePrice
+        )
+        // Use token as key for caching
+        livePrices[item.token] = item
         notifyItemChanged(index)
     }
 

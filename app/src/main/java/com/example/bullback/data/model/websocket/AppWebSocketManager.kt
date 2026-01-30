@@ -18,7 +18,6 @@ object AppWebSocketManager {
         webSocket?.send(message)
     }
 
-
     fun setMarketListener(listener: ((JSONObject) -> Unit)?) {
         marketListener = listener
     }
@@ -70,4 +69,5 @@ object AppWebSocketManager {
             isConnected = false
         }
     }
+
 }

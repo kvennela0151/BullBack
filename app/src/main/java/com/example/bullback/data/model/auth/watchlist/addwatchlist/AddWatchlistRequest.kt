@@ -1,22 +1,31 @@
 package com.example.bullback.data.model.auth.watchlist.addwatchlist
 
 import com.google.gson.annotations.SerializedName
-
 data class AddWatchlistRequest(
+    @SerializedName("script")
+    val script: String,
 
-    val exchange: String,
+    @SerializedName("symbol")
+    val symbol: String,
 
-    @SerializedName("expiry_date")
-    val expiryDate: String?,
+    @SerializedName("token")
+    val token: String,
 
     @SerializedName("instrument_type")
     val instrumentType: String,
 
+    @SerializedName("segment")
+    val segment: String,
+
+    @SerializedName("exchange")
+    val exchange: String,
+
+    @SerializedName("expiry_date")
+    val expiryDate: String,
+
     @SerializedName("lot_size")
     val lotSize: Int,
-    val script: String,
-    val segment: String,
-    val strike: Int,
-    val symbol: String,
-    val token: String
+
+    @SerializedName("strike")
+    val strike: Double
 )
