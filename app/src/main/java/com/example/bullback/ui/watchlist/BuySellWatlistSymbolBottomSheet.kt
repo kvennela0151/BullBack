@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.bullback.R
 import com.example.bullback.databinding.FragmentBuySellWatlistSymbolBottomSheetBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 

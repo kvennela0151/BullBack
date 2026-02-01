@@ -21,6 +21,9 @@ class WatchlistSymbolBottomSheet(
     private var _binding: FragmentWatchlistSymbolBottomSheetBinding? = null
     private val binding get() = _binding!!
 
+    // Track if we're already subscribed
+    private var isSubscribed = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,95 +36,213 @@ class WatchlistSymbolBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Set initial values
+        // Initial UI setup
         binding.tvSymbol.text = symbol
         binding.tvSegment.text = segment
         binding.tvLtp.text = String.format("%.2f", ltp)
 
-        // Start WebSocket listener only for this token
-        startWebSocketListener()
+        // Subscribe to updates
+        subscribeToUpdates()
 
         binding.btnBuy.setOnClickListener {
             val sheet = BuySellWatlistSymbolBottomSheet(symbol, segment, ltp, "BUY")
-            sheet.show(parentFragmentManager, "Buy")
+            sheet.show(parentFragmentManager, "BuySheet")
             dismiss()
         }
 
         binding.btnSell.setOnClickListener {
             val sheet = BuySellWatlistSymbolBottomSheet(symbol, segment, ltp, "SELL")
-            sheet.show(parentFragmentManager, "Sell")
+            sheet.show(parentFragmentManager, "SellSheet")
             dismiss()
         }
     }
 
-    private fun startWebSocketListener() {
+    private fun subscribeToUpdates() {
         AppWebSocketManager.setMarketListener { json ->
-
             if (json.optString("type") != "market_data") return@setMarketListener
             val data = json.optJSONObject("data") ?: return@setMarketListener
 
-            // Identify token type: INDEX/MCX uses "Token", Crypto uses "instrument_token"
-            val incomingToken = when {
-                data.has("Token") -> data.optLong("Token").toString()
-                data.has("instrument_token") -> data.optString("instrument_token")
-                else -> return@setMarketListener
+            // Determine if this update is for our symbol/token
+            val incomingToken: String?
+            val isForUs: Boolean
+
+            if (data.has("Token")) {
+                // Index/MCX format - match by numeric token
+                incomingToken = data.optLong("Token").toString()
+                isForUs = incomingToken == token
+            } else if (data.has("instrument_token")) {
+                // Crypto/Comex format - match by instrument_token as symbol
+                incomingToken = data.optString("instrument_token")
+                // Check both token and symbol for flexibility
+                isForUs = incomingToken == token || incomingToken == symbol
+            } else {
+                return@setMarketListener
             }
 
-            if (incomingToken != token) return@setMarketListener
+            if (!isForUs) return@setMarketListener
 
-            val newLtp = data.optDouble("LTP")
+            // Extract and update UI
+            updateUI(data)
+        }
 
-            val bid = data.optDouble("bid")
-            val ask = data.optDouble("ask")
-            val high = data.optDouble("H")
-            val low = data.optDouble("L")
-            val open = data.optDouble("O")
-            val close = data.optDouble("C")
-
-            val change = newLtp - close
-            val percent = if (close != 0.0) (change / close) * 100 else 0.0
-
-            requireActivity().runOnUiThread {
-                // Update LTP
-                binding.tvLtp.text = String.format("%.2f", newLtp)
-
-                // Bid / Ask
-                binding.tvBid.text = "Bid: $bid"
-                binding.tvAsk.text = "Ask: $ask"
-
-                // OHLC
-                binding.tvOpen.text = "O: $open"
-                binding.tvHigh.text = "H: $high"
-                binding.tvLow.text = "L: $low"
-                binding.tvClose.text = "C: $close"
-
-                // Change text
-                binding.tvChange.text =
-                    String.format("%.2f (%.2f%%)", change, percent)
-
-                // Apply color
-                val color = if (change >= 0)
-                    ContextCompat.getColor(requireContext(), R.color.green)
-                else
-                    ContextCompat.getColor(requireContext(), R.color.red)
-
-                binding.tvLtp.setTextColor(color)
-                binding.tvChange.setTextColor(color)
+        // Send subscription only once
+        if (!isSubscribed) {
+            val subscribe = JSONObject().apply {
+                put("type", "subscribe")
+                put("tokens", org.json.JSONArray().apply {
+                    put(token)
+                })
             }
+            AppWebSocketManager.sendMessage(subscribe.toString())
+            isSubscribed = true
+        }
+    }
+
+    private fun updateUI(data: JSONObject) {
+        // Extract LTP
+        val ltp = when {
+            data.has("LTP") -> data.optDouble("LTP")
+            data.has("ltp") -> data.optDouble("ltp")
+            data.has("last_price") -> data.optDouble("last_price")
+            else -> 0.0
         }
 
-        // Send subscribe message for this token
-        val subscribe = JSONObject().apply {
-            put("type", "subscribe")
-            put("tokens", listOf(token))
+        // Extract Bid/Ask with CORRECT LOGIC
+        var bid = 0.0
+        var ask = 0.0
+
+        try {
+            // Check if we have direct bid/ask fields first (Crypto/Comex format)
+            if (data.has("bid") || data.has("ask")) {
+                bid = data.optDouble("bid", 0.0)
+                ask = data.optDouble("ask", 0.0)
+            }
+            // Otherwise check for Buy/Sell arrays (Index/MCX format)
+            else if (data.has("Buy") && data.has("Sell")) {
+                // Bid is the highest buying price (from Buy array)
+                val buyArray = data.optJSONArray("Buy")
+                if (buyArray != null && buyArray.length() > 0) {
+                    var maxBid = 0.0
+                    for (i in 0 until buyArray.length()) {
+                        val buyObj = buyArray.optJSONObject(i)
+                        val price = buyObj?.optDouble("price") ?: 0.0
+                        if (price > 0 && price > maxBid) maxBid = price
+                    }
+                    bid = maxBid
+                }
+
+                // Ask is the lowest selling price (from Sell array)
+                val sellArray = data.optJSONArray("Sell")
+                if (sellArray != null && sellArray.length() > 0) {
+                    var minAsk = Double.MAX_VALUE
+                    for (i in 0 until sellArray.length()) {
+                        val sellObj = sellArray.optJSONObject(i)
+                        val price = sellObj?.optDouble("price") ?: Double.MAX_VALUE
+                        if (price > 0 && price < minAsk) minAsk = price
+                    }
+                    ask = if (minAsk == Double.MAX_VALUE) 0.0 else minAsk
+                }
+            }
+        } catch (e: Exception) {
+            // Fallback to direct fields if arrays not available
+            bid = data.optDouble("bid", 0.0)
+            ask = data.optDouble("ask", 0.0)
         }
-        AppWebSocketManager.sendMessage(subscribe.toString())
+
+        // Extract OHLC
+        val open = data.optDouble("O", data.optDouble("open", 0.0))
+        val high = data.optDouble("H", data.optDouble("high", 0.0))
+        val low = data.optDouble("L", data.optDouble("low", 0.0))
+        val close = data.optDouble("C", data.optDouble("close", 0.0))
+
+        // Calculate change - handle both formats
+        val change: Double
+        val changePercent: Double
+
+        if (data.has("change") && data.has("change_percent")) {
+            // Crypto/Comex format - use provided change values
+            change = data.optDouble("change", 0.0)
+            changePercent = data.optDouble("change_percent", 0.0)
+        } else {
+            // Index/MCX format - calculate from close price
+            val previousClose = close
+            change = ltp - previousClose
+            changePercent = if (previousClose != 0.0) (change / previousClose) * 100 else 0.0
+        }
+
+        // Extract expiry date if available
+        val expiryDate = data.optString("expiry_date", "")
+
+        // Update UI on main thread
+        requireActivity().runOnUiThread {
+            // Determine decimal places based on price magnitude (crypto needs more precision)
+            val decimalPlaces = when {
+                ltp < 1.0 -> 6      // For very small values like 0.000123
+                ltp < 10.0 -> 5     // For small values like 5.12345
+                ltp < 100.0 -> 5    // For medium values like 17.10061
+                ltp < 1000.0 -> 2   // For higher values like 117.60
+                else -> 2           // For large values like 25343.00
+            }
+
+            binding.tvLtp.text = String.format("%.${decimalPlaces}f", ltp)
+
+            // Update Bid/Ask with same decimal places
+            binding.tvBid.text = if (bid > 0) "Bid: %.${decimalPlaces}f".format(bid) else "Bid: -"
+            binding.tvAsk.text = if (ask > 0) "Ask: %.${decimalPlaces}f".format(ask) else "Ask: -"
+
+            // Update OHLC - without "O:", "H:", etc. labels
+            binding.tvOpen.text = "O: %.${decimalPlaces}f".format(open)
+            binding.tvHigh.text = "H: %.${decimalPlaces}f".format(high)
+            binding.tvLow.text = "L: %.${decimalPlaces}f".format(low)
+            binding.tvClose.text = "C: %.${decimalPlaces}f".format(close)
+
+            // Update Expiry if available
+            if (expiryDate.isNotEmpty()) {
+                binding.tvExpiry.text = expiryDate
+            }
+
+            // Update Change - format: -0.10 (0.00%) where percentage is absolute value
+            val changeDecimalPlaces = if (Math.abs(change) < 1.0) decimalPlaces else 2
+            val changeFormatted = if (change >= 0) {
+                String.format("+%.${changeDecimalPlaces}f", change)
+            } else {
+                String.format("%.${changeDecimalPlaces}f", change)
+            }
+            val percentFormatted = String.format("%.2f", Math.abs(changePercent))
+
+            binding.tvChange.text = "$changeFormatted ($percentFormatted%)"
+
+            // Update colors
+            val color = if (change >= 0)
+                ContextCompat.getColor(requireContext(), R.color.green)
+            else
+                ContextCompat.getColor(requireContext(), R.color.red)
+
+            binding.tvLtp.setTextColor(color)
+            binding.tvChange.setTextColor(color)
+
+            // Color bid/ask separately for better visual distinction
+            binding.tvBid.setTextColor(ContextCompat.getColor(requireContext(), R.color.button_green_dark))
+            binding.tvAsk.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        // Unsubscribe when bottom sheet is closed
+        if (isSubscribed) {
+            val unsubscribe = JSONObject().apply {
+                put("type", "unsubscribe")
+                put("tokens", org.json.JSONArray().apply {
+                    put(token)
+                })
+            }
+            AppWebSocketManager.sendMessage(unsubscribe.toString())
+            isSubscribed = false
+        }
+
         AppWebSocketManager.setMarketListener(null)
         _binding = null
     }
 }
-

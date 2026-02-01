@@ -29,6 +29,15 @@ data class WatchlistSymbol(
 
     var changePercent: Double = 0.0,
     var closePrice: Double = 0.0,
+    @SerializedName("open")
+    var openPrice: Double = 0.0,
+    @SerializedName("high")
+    var highPrice: Double = 0.0,
+    @SerializedName("low")
+    var lowPrice: Double = 0.0,
+
+
+
     val bid: Double? = null,
     val ask: Double? = null
 

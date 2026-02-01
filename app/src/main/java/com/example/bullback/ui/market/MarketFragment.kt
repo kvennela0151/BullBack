@@ -33,6 +33,9 @@ class MarketFragment : Fragment() {
     private lateinit var authRepository: AuthRepository
     private lateinit var marketApi: MarketApi
 
+    private lateinit var progressBar: View
+
+
     private var currentTokens: List<String> = emptyList()
 
     override fun onCreateView(
@@ -44,6 +47,8 @@ class MarketFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        progressBar = view.findViewById(R.id.progressBar)
+
         super.onViewCreated(view, savedInstanceState)
 
         authRepository = AuthRepository.getInstance(requireContext())
@@ -150,6 +155,7 @@ class MarketFragment : Fragment() {
 
         indicesAdapter.updateData(data)
         subscribeWebSocket(data.map { it.instrumentToken })
+
     }
 
     private fun loadCommodities() {
@@ -235,6 +241,18 @@ class MarketFragment : Fragment() {
     private fun showError(msg: String) {
         Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
     }
+
+    private fun showLoader() {
+        progressBar.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
+    }
+
+    private fun hideLoader() {
+        progressBar.visibility = View.GONE
+        recyclerView.visibility = View.VISIBLE
+    }
+
+
 }
 
 
