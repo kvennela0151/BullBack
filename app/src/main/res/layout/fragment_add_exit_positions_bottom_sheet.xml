@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="10dp"
     android:background="@drawable/bg_bottom_sheet">
 
     <!-- Header -->
     <LinearLayout
+        android:id="@+id/headerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -23,13 +23,15 @@
             android:src="@drawable/ic_back"/>
 
         <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="120dp"
+            android:paddingLeft="125dp"
             android:text="Enable Stoploss &amp; Target"
             android:textSize="14sp"
-            android:textColor="#7A7A7A"/>
+            android:gravity="center"
+            android:textColor="@color/black"/>
 
         <Switch
             android:id="@+id/switchSL"
@@ -37,12 +39,14 @@
             android:layout_height="48dp"/>
     </LinearLayout>
 
-    <!-- Instrument Info -->
+    <!-- Symbol Layout -->
     <LinearLayout
+        android:id="@+id/symbolLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="12dp">
+        android:paddingTop="6dp"
+        android:gravity="center_vertical">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -51,69 +55,96 @@
             android:orientation="vertical">
 
             <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:id="@+id/tvSymbol"
-                android:text="NIFTY26JANFUT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="BANKNIFTY26FEBFUT"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black" />
 
             <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:id="@+id/tvSegment"
-                android:text="INDEX-FUT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="INDEX-FUT | MIS"
                 android:textSize="12sp"
                 android:textColor="#7A7A7A"
-                android:layout_marginTop="4dp"/>
+                android:layout_marginTop="3dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvExpiry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="26 Feb"
+            android:textSize="12sp"
+            android:textColor="#7A7A7A" />
+    </LinearLayout>
+
+    <!-- BID / ASK / LTP -->
+    <LinearLayout
+        android:id="@+id/marketDataLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+
+        <LinearLayout
+            android:id="@+id/bidAskLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
             <TextView
-                android:layout_height="wrap_content"
+                android:id="@+id/tvBid"
                 android:layout_width="wrap_content"
-                android:id="@+id/tvBidAsk"
-                android:text="Bid: 25305   Ask: 25310.3"
-                android:textSize="13sp"
-                android:textColor="#C62828"
-                android:layout_marginTop="4dp"/>
+                android:layout_height="wrap_content"
+                android:text="Bid: 58611"
+                android:textSize="14sp"
+                android:textColor="@color/green" />
+
+            <TextView
+                android:id="@+id/tvAsk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:text="Ask: 58619.8"
+                android:textColor="@color/red"
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ltpChangeLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="end">
 
             <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:id="@+id/tvDate"
-                android:text="2026-01-27"
-                android:textSize="12sp"
-                android:textColor="#7A7A7A"/>
-
-            <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:id="@+id/tvLtp"
-                android:text="25310.3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="58611.2"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="#C62828"
-                android:layout_marginTop="4dp"/>
+                android:textColor="@color/red" />
 
             <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:id="@+id/tvChange"
-                android:text="-44.70 (-0.18%)"
-                android:textSize="13sp"
-                android:textColor="#C62828"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-90.20 (-0.15%)"
+                android:textSize="14sp"
+                android:textColor="@color/red"
+                android:layout_marginTop="3dp" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Divider -->
+    <!-- DIVIDER -->
     <View
+        android:id="@+id/divider1"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginVertical="16dp"
@@ -121,120 +152,189 @@
 
     <!-- OHLC -->
     <LinearLayout
+        android:id="@+id/ohlcLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="4"
-        android:layout_marginTop="1dp">
+        android:weightSum="4">
 
         <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:id="@+id/tvOpen"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="O: 25379.9"
-            android:textSize="12sp"
-            android:textColor="@color/black"/>
+            android:text="O: 58611"
+            android:textSize="13sp"
+            android:textColor="#6A6A6A" />
 
         <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:id="@+id/tvHigh"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="H: 25379.9"
-            android:textSize="12sp"
-            android:textColor="@color/black"/>
+            android:text="H: 58818.2"
+            android:textSize="13sp"
+            android:textColor="#6A6A6A" />
 
         <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:id="@+id/tvLow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="L: 25268.2"
-            android:textSize="12sp"
-            android:textColor="@color/black"/>
+            android:text="L: 58151"
+            android:textSize="13sp"
+            android:textColor="#6A6A6A" />
 
         <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:id="@+id/tvClose"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="C: 25349.8"
-            android:textSize="12sp"
-            android:textColor="@color/black"/>
+            android:text="C: 58701.4"
+            android:textSize="13sp"
+            android:textColor="#6A6A6A" />
     </LinearLayout>
 
-    <!-- Divider -->
+    <!-- DIVIDER -->
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="16dp"
+        android:background="#EAEAEA" />
+
+    <!-- OHLC -->
+    <LinearLayout
+        android:id="@+id/lotsLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+        <TextView
+            android:id="@+id/tvMaxLot"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Max Lot: 300"
+            android:textSize="13sp"
+            android:textColor="#6A6A6A" />
+
+        <TextView
+            android:id="@+id/tvOrderLot"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Order Lot: 200"
+            android:textSize="13sp"
+            android:textColor="#6A6A6A" />
+
+        <TextView
+            android:id="@+id/tvLotSize"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Lot Size: 30"
+            android:textSize="13sp"
+            android:textColor="#6A6A6A" />
+
+        <TextView
+            android:id="@+id/tvQty"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Qty: 40"
+            android:textSize="13sp"
+            android:textColor="#6A6A6A" />
+    </LinearLayout>
+
+    <!-- DIVIDER -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginVertical="16dp"
         android:background="#EAEAEA" />
 
-    <!-- Lot Info -->
+    <!-- CURRENT PNL -->
     <LinearLayout
+        android:id="@+id/pnlLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="4"
-        android:layout_marginTop="1dp">
+        android:gravity="center_vertical">
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/pnlInfoLayout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/tvMaxLot"
             android:layout_weight="1"
-            android:text="Max Lot: 100"
-            android:textSize="12sp"
-            android:textColor="@color/black"/>
+            android:orientation="vertical">
 
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/tvOrderLot"
-            android:layout_weight="1"
-            android:text="Order Lot: 100"
-            android:textColor="@color/black"
-            android:textSize="12sp"/>
+            <TextView
+                android:id="@+id/tvPnl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Current P&amp;L"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/black" />
 
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/tvLotSize"
-            android:layout_weight="1"
-            android:textColor="@color/black"
-            android:text="Lot Size: 65"
-            android:textSize="12sp"/>
+            <TextView
+                android:id="@+id/tvAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+68554.32"
+                android:textSize="18sp"
+                android:textColor="@color/green"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
 
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/tvQty"
-            android:layout_weight="1"
-            android:textColor="@color/black"
-            android:text="Qty: 65"
-            android:textSize="12sp"/>
+        <Button
+            android:id="@+id/btnExitAll"
+            android:layout_width="70dp"
+            android:layout_height="48dp"
+            android:text="EXIT ALL"
+            android:textStyle="bold"
+            android:textSize="10sp"
+            android:backgroundTint="@color/red"
+            android:textColor="@color/white" />
     </LinearLayout>
 
-    <!-- Tabs -->
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
+    <!-- DIVIDER -->
+    <View
+        android:id="@+id/divider3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="16dp"
+        android:background="#EAEAEA" />
+
+    <!-- MARKET / LIMIT -->
+    <LinearLayout
+        android:id="@+id/orderTypeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:tabIndicatorColor="@color/black"
-        app:tabSelectedTextColor="@color/black" >
+        android:orientation="horizontal">
 
-        <com.google.android.material.tabs.TabItem
+        <TextView
+            android:id="@+id/tvMarket"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="Market"/>
+            android:layout_weight="1"
+            android:text="Market"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black" />
 
-        <com.google.android.material.tabs.TabItem
+        <TextView
+            android:id="@+id/tvLimit"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="Limit"/>
-    </com.google.android.material.tabs.TabLayout>
+            android:layout_weight="1"
+            android:text="Limit"
+            android:textSize="16sp"
+            android:gravity="end"
+            android:textColor="#8A8A8A" />
+    </LinearLayout>
 
     <!-- Price Input -->
     <com.google.android.material.textfield.TextInputLayout
@@ -251,6 +351,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:enabled="false"
+            android:inputType="numberDecimal"
             android:padding="14dp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -314,9 +415,9 @@
 
     </LinearLayout>
 
-
     <!-- Divider -->
     <View
+        android:id="@+id/divider4"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginVertical="16dp"
@@ -324,6 +425,7 @@
 
     <!-- Funds Info -->
     <LinearLayout
+        android:id="@+id/fundsInfoLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -331,50 +433,43 @@
         android:layout_marginTop="1dp">
 
         <TextView
+            android:id="@+id/tvIntraday"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:id="@+id/tvIntraday"
             android:layout_weight="1"
             android:text="Intraday: 25379.9"
             android:textSize="12sp"
             android:textColor="@color/black"/>
 
         <TextView
+            android:id="@+id/tvCarry"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:id="@+id/tvCarry"
             android:layout_weight="1"
             android:text="Carry: 25379.9"
             android:textSize="12sp"
             android:textColor="@color/black"/>
 
         <TextView
+            android:id="@+id/tvAvailableFunds"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:id="@+id/tvAvialFunds"
             android:layout_weight="1"
             android:text="Avail. Funds: 25268.2"
             android:textSize="12sp"
             android:textColor="@color/black"/>
-
     </LinearLayout>
 
-    <!-- Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginVertical="16dp"
-        android:background="#EAEAEA" />
-
-    <!-- Place Order -->
+    <!-- ACTION BUTTON -->
     <Button
-        android:id="@+id/btnPlaceOrder"
+        android:id="@+id/btnAction"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:text="Place Order"
-        android:textSize="16sp"
-        android:textColor="@color/black"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/button_green_dark"/>
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:text="Add More"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:backgroundTint="@color/green"
+        android:textColor="@color/white" />
 
 </LinearLayout>

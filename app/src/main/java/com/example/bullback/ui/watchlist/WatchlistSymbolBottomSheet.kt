@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import com.example.bullback.R
 import com.example.bullback.data.model.websocket.AppWebSocketManager
 import org.json.JSONObject
-
 class WatchlistSymbolBottomSheet(
     private val symbol: String,
     private val segment: String,
@@ -45,15 +44,13 @@ class WatchlistSymbolBottomSheet(
         subscribeToUpdates()
 
         binding.btnBuy.setOnClickListener {
-            val sheet = BuySellWatlistSymbolBottomSheet(symbol, segment, ltp, "BUY")
+            val sheet = BuySellWatlistSymbolBottomSheet(symbol, segment, ltp, "BUY", token)
             sheet.show(parentFragmentManager, "BuySheet")
-            dismiss()
         }
 
         binding.btnSell.setOnClickListener {
-            val sheet = BuySellWatlistSymbolBottomSheet(symbol, segment, ltp, "SELL")
+            val sheet = BuySellWatlistSymbolBottomSheet(symbol, segment, ltp, "SELL", token)
             sheet.show(parentFragmentManager, "SellSheet")
-            dismiss()
         }
     }
 

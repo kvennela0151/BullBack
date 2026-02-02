@@ -161,6 +161,58 @@
         android:layout_marginVertical="16dp"
         android:background="#EAEAEA" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:id="@+id/tvPnl"
+                android:text="Current P&amp;L"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:id="@+id/tvAmount"
+                android:text="-5990.00"
+                android:textSize="18sp"
+                android:textColor="@color/red"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end">
+
+            <Button
+                android:layout_width="70dp"
+                android:layout_height="35dp"
+                android:id="@+id/bntExitAll"
+                android:text="EXIT ALL"
+                android:textStyle="bold"
+                android:backgroundTint="@color/red"
+                android:textSize="10sp"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+
     <!-- Action Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -174,7 +226,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="BUY"
+            android:text="Add More"
             android:textSize="16sp"
             android:textColor="@color/black"
             android:backgroundTint="@color/button_green_dark" />
@@ -188,7 +240,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="SELL"
+            android:text="Partial Exit"
             android:textSize="16sp"
             android:textColor="@color/black"
             android:backgroundTint="@color/red" />

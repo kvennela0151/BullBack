@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="10dp"
-    android:background="@drawable/bg_bottom_sheet">
+    android:padding="10dp">
 
     <!-- Header -->
     <LinearLayout
@@ -33,8 +31,8 @@
 
         <Switch
             android:id="@+id/switchSL"
-            android:layout_width="48dp"
-            android:layout_height="48dp"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
     <!-- Instrument Info -->
@@ -171,49 +169,24 @@
         android:layout_marginVertical="16dp"
         android:background="#EAEAEA" />
 
-    <!-- Lot Info -->
+    <!-- Lot size -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="4"
-        android:layout_marginTop="1dp">
+        android:paddingTop="6dp">
 
         <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/tvMaxLot"
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:text="Max Lot: 100"
-            android:textSize="12sp"
-            android:textColor="@color/black"/>
+            android:layout_height="wrap_content"
+            android:text="Lot Size: 1" />
 
         <TextView
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:id="@+id/tvOrderLot"
-            android:layout_weight="1"
-            android:text="Order Lot: 100"
-            android:textColor="@color/black"
-            android:textSize="12sp"/>
+            android:layout_height="wrap_content"
+            android:text="Qty: 1" />
 
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/tvLotSize"
-            android:layout_weight="1"
-            android:textColor="@color/black"
-            android:text="Lot Size: 65"
-            android:textSize="12sp"/>
-
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/tvQty"
-            android:layout_weight="1"
-            android:textColor="@color/black"
-            android:text="Qty: 65"
-            android:textSize="12sp"/>
     </LinearLayout>
 
     <!-- Tabs -->
@@ -221,19 +194,22 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         app:tabIndicatorColor="@color/black"
-        app:tabSelectedTextColor="@color/black" >
+        app:tabSelectedTextColor="@color/black">
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabMarket"
+            android:text="Market"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"/>
 
         <com.google.android.material.tabs.TabItem
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="Market"/>
+            android:layout_width="match_parent"
+            android:id="@+id/tabLimit"
+            android:text="Limit" />
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="Limit"/>
     </com.google.android.material.tabs.TabLayout>
 
     <!-- Price Input -->
@@ -272,109 +248,36 @@
             android:padding="14dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Stoploss & Target Container -->
-    <LinearLayout
-        android:id="@+id/layoutStoplossTarget"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:orientation="horizontal"
-        android:weightSum="2"
-        android:visibility="gone">
-
-        <!-- Stoploss Field -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etStoploss"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Stoploss"
-                android:inputType="numberDecimal"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Target Field -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etTarget"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Target"
-                android:inputType="numberDecimal"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-    </LinearLayout>
-
-
-    <!-- Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginVertical="16dp"
-        android:background="@color/black" />
-
-    <!-- Funds Info -->
+    <!-- Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="3"
-        android:layout_marginTop="1dp">
+        android:gravity="center"
+        android:layout_marginTop="20dp">
 
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/tvIntraday"
+        <Button
+            android:id="@+id/btnModify"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
             android:layout_weight="1"
-            android:text="Intraday: 25379.9"
-            android:textSize="12sp"
-            android:textColor="@color/black"/>
+            android:backgroundTint="@color/black"
+            android:text="MODIFY"
+            android:textColor="@color/white" />
 
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/tvCarry"
-            android:layout_weight="1"
-            android:text="Carry: 25379.9"
-            android:textSize="12sp"
-            android:textColor="@color/black"/>
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="wrap_content" />
 
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/tvAvialFunds"
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:text="Avail. Funds: 25268.2"
-            android:textSize="12sp"
-            android:textColor="@color/black"/>
+            android:layout_height="50dp"
+            android:backgroundTint="#D32F2F"
+            android:text="DELETE"
+            android:textColor="@color/white" />
 
     </LinearLayout>
-
-    <!-- Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginVertical="16dp"
-        android:background="#EAEAEA" />
-
-    <!-- Place Order -->
-    <Button
-        android:id="@+id/btnPlaceOrder"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:text="Place Order"
-        android:textSize="16sp"
-        android:textColor="@color/black"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/button_green_dark"/>
 
 </LinearLayout>
