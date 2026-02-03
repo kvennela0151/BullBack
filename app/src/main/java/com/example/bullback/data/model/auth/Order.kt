@@ -14,7 +14,7 @@ data class Order(
     val exchange: String,
 
     @SerializedName("quantity")
-    val quantity: Double,
+    val quantity: Int,
 
     @SerializedName("price")
     val price: String,
@@ -29,5 +29,13 @@ data class Order(
     val status: String,
 
     @SerializedName("created_at")
-    val createdAt: String
+    val createdAt: String,
+
+    // Add token field for WebSocket subscription
+    @SerializedName("token")
+    val token: String? = null,
+
+    // Alternative field names if your API uses different naming
+    @SerializedName("instrument_token")
+    val instrumentToken: String? = null
 )

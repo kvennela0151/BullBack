@@ -387,4 +387,6 @@ class PositionDetailsBottomSheet(
         AppWebSocketManager.setMarketListener(null)
         _binding = null
     }
+
+
 }

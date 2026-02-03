@@ -10,6 +10,8 @@ data class PositionsItem(
     val userId: Int,
 
     val username: String,
+    val tradingSymbol: String,
+
     val symbol: String,
 
     @SerializedName("instrument_token")

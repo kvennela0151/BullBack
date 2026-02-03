@@ -21,7 +21,7 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
     private var _binding: FragmentPositionsBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: PositionsViewModel
+    lateinit var viewModel: PositionsViewModel
     private lateinit var adapter: PositionsAdapter
     private lateinit var authRepository: AuthRepository
 
@@ -108,7 +108,7 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
             // Show confirmation dialog first
             android.app.AlertDialog.Builder(requireContext())
                 .setTitle("Exit All Positions?")
-                .setMessage("Are you sure you want to exit all open positions?")
+                .setMessage("Are you sure you want to squareoff all positions?")
                 .setPositiveButton("Exit All") { _, _ ->
                     exitAllPositions()
                 }
@@ -285,6 +285,7 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
 
         return unrealized
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

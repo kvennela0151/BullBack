@@ -65,7 +65,31 @@ class OrdersFragment : Fragment() {
 
     private fun setupRecyclerView() {
         ordersAdapter = OrdersAdapter { order ->
-            onOrderClicked(order)
+
+            val bottomSheet = OrderBottomSheetFragment()
+
+            val bundle = Bundle().apply {
+                putString("symbol", order.symbol ?: "")
+                putString("status", order.status ?: "")
+                putString("price", order.price ?: "")
+                putInt("quantity", order.quantity ?: 0)
+                putInt("orderId", order.id ?: 0)
+
+                // IMPORTANT: Add the token parameter
+                // You need to get this from your Order model
+                // If your Order model doesn't have a token field, you'll need to add it
+                // or fetch it from somewhere else (e.g., a mapping of symbol to token)
+                putString("token", order.token ?: "")
+
+                // Alternative: If you don't have token in Order model, you can:
+                // 1. Add a token field to your Order data class
+                // 2. Or create a mapping function to get token from symbol
+                // Example:
+                // putString("token", getTokenForSymbol(order.symbol ?: ""))
+            }
+
+            bottomSheet.arguments = bundle
+            bottomSheet.show(parentFragmentManager, "OrderBottomSheet")
         }
 
         binding.rvOrders.apply {
@@ -99,6 +123,18 @@ class OrdersFragment : Fragment() {
             "${order.symbol} - ${order.status}",
             Toast.LENGTH_SHORT
         ).show()
+    }
+
+    // Helper function to map symbol to token (if needed)
+    // You can implement this based on your data structure
+    private fun getTokenForSymbol(symbol: String): String {
+        // Example mapping - replace with your actual logic
+        return when {
+            symbol.contains("NIFTY", ignoreCase = true) -> "15148802" // Example NIFTY token
+            symbol.contains("BANKNIFTY", ignoreCase = true) -> "123456" // Example
+            // Add more mappings as needed
+            else -> ""
+        }
     }
 
     override fun onDestroyView() {

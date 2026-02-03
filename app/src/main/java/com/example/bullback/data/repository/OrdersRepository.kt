@@ -1,6 +1,5 @@
 package com.example.bullback.data.repository
 
-import androidx.room.Index
 import com.example.bullback.data.model.auth.Order
 import com.example.bullback.data.remote.RetrofitClient
 import com.example.bullback.data.remote.api.OrdersApiService

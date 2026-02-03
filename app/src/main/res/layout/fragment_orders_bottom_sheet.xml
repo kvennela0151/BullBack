@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/llRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:background="@drawable/bg_bottom_sheet">
 
-    <!-- Header -->
+    <!-- Header with Back Button and Switch -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -30,9 +32,9 @@
             android:textColor="#7A7A7A"/>
 
         <Switch
-            android:id="@+id/switchSL"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:id="@+id/switchStoplossTarget"
+            android:layout_width="48dp"
+            android:layout_height="48dp"/>
     </LinearLayout>
 
     <!-- Instrument Info -->
@@ -44,33 +46,32 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical" android:layout_height="wrap_content">
 
             <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:id="@+id/tvSymbol"
-                android:text="NIFTY26JANFUT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NIFTY26APR FUT"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"/>
 
             <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:id="@+id/tvSegment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="INDEX-FUT"
                 android:textSize="12sp"
                 android:textColor="#7A7A7A"
                 android:layout_marginTop="4dp"/>
 
             <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:id="@+id/tvBidAsk"
-                android:text="Bid: 25305   Ask: 25310.3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bid: 1222.3   Ask: 26195.6"
                 android:textSize="13sp"
                 android:textColor="#C62828"
                 android:layout_marginTop="4dp"/>
@@ -83,30 +84,30 @@
             android:gravity="end">
 
             <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:id="@+id/tvDate"
-                android:text="2026-01-27"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2026-02-03"
                 android:textSize="12sp"
                 android:textColor="#7A7A7A"/>
 
             <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:id="@+id/tvLtp"
-                android:text="25310.3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="26197.8"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="#C62828"
+                android:textColor="#4CAF50"
                 android:layout_marginTop="4dp"/>
 
             <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:id="@+id/tvChange"
-                android:text="-44.70 (-0.18%)"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+764.40 (3.01%)"
                 android:textSize="13sp"
-                android:textColor="#C62828"/>
+                android:textColor="#4CAF50"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -122,42 +123,41 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="4"
-        android:layout_marginTop="1dp">
+        android:weightSum="4">
 
         <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:id="@+id/tvOpen"
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:text="O: 25379.9"
+            android:layout_height="wrap_content"
+            android:text="O: 120"
             android:textSize="12sp"
             android:textColor="@color/black"/>
 
         <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:id="@+id/tvHigh"
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:text="H: 25379.9"
+            android:layout_height="wrap_content"
+            android:text="H: 26610.7"
             android:textSize="12sp"
             android:textColor="@color/black"/>
 
         <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:id="@+id/tvLow"
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:text="L: 25268.2"
+            android:layout_height="wrap_content"
+            android:text="L: 26020"
             android:textSize="12sp"
             android:textColor="@color/black"/>
 
         <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:id="@+id/tvClose"
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:text="C: 25349.8"
+            android:layout_height="wrap_content"
+            android:text="C: 25433.4"
             android:textSize="12sp"
             android:textColor="@color/black"/>
     </LinearLayout>
@@ -169,7 +169,7 @@
         android:layout_marginVertical="16dp"
         android:background="#EAEAEA" />
 
-    <!-- Lot size -->
+    <!-- Lot size and Qty -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -185,8 +185,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Qty: 1" />
-
+            android:text="Qty: 65" />
     </LinearLayout>
 
     <!-- Tabs -->
@@ -196,30 +195,17 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         app:tabIndicatorColor="@color/black"
-        app:tabSelectedTextColor="@color/black">
+        app:tabSelectedTextColor="@color/black" />
 
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabMarket"
-            android:text="Market"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"/>
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:id="@+id/tabLimit"
-            android:text="Limit" />
-
-    </com.google.android.material.tabs.TabLayout>
 
     <!-- Price Input -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/priceLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="Price"
         app:endIconMode="custom"
         app:endIconDrawable="@drawable/ic_lock"
-        android:hint="Price"
         android:layout_marginTop="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -247,6 +233,46 @@
             android:inputType="number"
             android:padding="14dp" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Stoploss & Target (Hidden initially) -->
+    <LinearLayout
+        android:id="@+id/llStoplossTarget"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:layout_marginTop="12dp"
+        android:weightSum="2">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="Stoploss">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etStoploss"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="numberDecimal"
+                android:padding="14dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:hint="Target">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etTarget"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="numberDecimal"
+                android:padding="14dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
 
     <!-- Buttons -->
     <LinearLayout
@@ -277,7 +303,6 @@
             android:backgroundTint="#D32F2F"
             android:text="DELETE"
             android:textColor="@color/white" />
-
     </LinearLayout>
 
 </LinearLayout>

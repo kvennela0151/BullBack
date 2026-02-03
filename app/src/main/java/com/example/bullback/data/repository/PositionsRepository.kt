@@ -1,8 +1,11 @@
 package com.example.bullback.data.repository
 
 import com.example.bullback.data.model.positions.PositionsItem
+import com.example.bullback.data.model.positions.exitall.ExitAllRequest
+import com.example.bullback.data.model.positions.exitall.ExitAllResponse
 import com.example.bullback.data.remote.RetrofitClient
 import com.example.bullback.data.remote.api.PositionsApiService
+import retrofit2.Response
 
 // PositionsRepository.kt
 class PositionsRepository {
@@ -17,5 +20,15 @@ class PositionsRepository {
             throw Exception("API failed: ${response.code()} ${response.message()}")
         }
     }
+
+    suspend fun exitAllPositions(list: List<String>): Response<ExitAllResponse> {
+        val request = ExitAllRequest(
+            mode = "symbols",
+            symbols = list
+        )
+        return api.exitAllPositions(request)
+    }
+
+
 }
 

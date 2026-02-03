@@ -23,7 +23,7 @@
     <!-- Tabs -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:tabIndicatorColor="@android:color/black"
         app:tabSelectedTextColor="@android:color/black"
@@ -32,8 +32,6 @@
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-
-
     </com.google.android.material.tabs.TabLayout>
 
     <!-- Orders List -->
@@ -45,8 +43,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- Bottom Navigation -->
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

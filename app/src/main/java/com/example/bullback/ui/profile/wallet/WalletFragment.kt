@@ -25,6 +25,17 @@ class WalletFragment : Fragment(R.layout.fragment_wallet) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentWalletBinding.bind(view)
 
+        binding.bntAddFunds.setOnClickListener {
+            val bottomSheet = DepositBottomSheet()
+            bottomSheet.show(parentFragmentManager, "DepositBottomSheet")
+        }
+
+        binding.bntWithdrawal.setOnClickListener {
+            val bottomSheet = WithdrawBottomSheet()
+            bottomSheet.show(parentFragmentManager, "WithdrawalBottomSheet")
+        }
+
+
         setupViewModel()
         setupRecyclerView()
         setupTabs()
@@ -36,7 +47,7 @@ class WalletFragment : Fragment(R.layout.fragment_wallet) {
     }
 
     private fun setupViewModel() {
-        // ✅ CORRECT WAY
+        // CORRECT WAY
         val api = RetrofitClient.createService(WalletApiService::class.java)
 
         val repository = WalletRepository(api)

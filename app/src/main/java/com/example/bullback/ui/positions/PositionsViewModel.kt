@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bullback.data.model.positions.PositionsItem
+import com.example.bullback.data.model.positions.exitall.ExitAllResponse
 import com.example.bullback.data.repository.PositionsRepository
 import kotlinx.coroutines.launch
 
@@ -20,6 +21,10 @@ class PositionsViewModel(
     val openPnl: LiveData<Double> = _openPnl
 
     private var currentStatus = "OPEN"
+
+    private val _exitAllResponse = MutableLiveData<ExitAllResponse?>()
+    val exitAllResponse: LiveData<ExitAllResponse?> = _exitAllResponse
+
 
     fun setStatus(status: String) {
         currentStatus = status
@@ -37,5 +42,23 @@ class PositionsViewModel(
             }
         }
     }
+
+    fun exitAllPositions(symbols: List<String>) {
+        viewModelScope.launch {
+            try {
+                val response = repository.exitAllPositions(symbols)
+                if (response.isSuccessful) {
+                    _exitAllResponse.postValue(response.body())
+                } else {
+                    _exitAllResponse.postValue(null)
+                }
+            } catch (e: Exception) {
+                _exitAllResponse.postValue(null)
+            }
+        }
+    }
+
+
+
 }
 

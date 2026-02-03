@@ -2,6 +2,7 @@ package com.example.bullback.ui.profile.wallet
 
 import androidx.lifecycle.*
 import com.example.bullback.data.model.wallet.WalletTransaction
+import com.example.bullback.data.model.wallet.depositwithdrawal.BankAccountData
 import com.example.bullback.data.repository.WalletRepository
 import kotlinx.coroutines.launch
 
@@ -15,6 +16,10 @@ class WalletViewModel(
     private val _loading = MutableLiveData<Boolean>()
     val loading: LiveData<Boolean> = _loading
 
+
+    private val _bankDetails = MutableLiveData<BankAccountData>()
+    val bankDetails: LiveData<BankAccountData> = _bankDetails
+
     fun loadTransactions(type: String) {
         viewModelScope.launch {
             _loading.value = true
@@ -24,6 +29,21 @@ class WalletViewModel(
                 _transactions.value = emptyList()
             }
             _loading.value = false
+        }
+    }
+
+    fun loadBankDetails() {
+        viewModelScope.launch {
+            try {
+                val resp = repository.getActiveBankAccount()
+                if (resp.isSuccessful) {
+                    resp.body()?.data?.let {
+                        _bankDetails.postValue(it)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }
