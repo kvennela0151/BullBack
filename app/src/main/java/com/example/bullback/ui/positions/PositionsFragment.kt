@@ -286,7 +286,6 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
         return unrealized
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

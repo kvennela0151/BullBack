@@ -42,23 +42,5 @@ class PositionsViewModel(
             }
         }
     }
-
-    fun exitAllPositions(symbols: List<String>) {
-        viewModelScope.launch {
-            try {
-                val response = repository.exitAllPositions(symbols)
-                if (response.isSuccessful) {
-                    _exitAllResponse.postValue(response.body())
-                } else {
-                    _exitAllResponse.postValue(null)
-                }
-            } catch (e: Exception) {
-                _exitAllResponse.postValue(null)
-            }
-        }
-    }
-
-
-
 }
 

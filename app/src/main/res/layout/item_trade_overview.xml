@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
+
+    <!-- Row 1: Name + Tag + Profit/Loss -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvSymbol"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BTCTHB"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Type Tag (CRYPTO, MCX) -->
+        <TextView
+            android:id="@+id/tvTypeTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CRYPTO"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
+            android:layout_marginStart="8dp"
+            android:background="#2A3242"
+            android:textColor="#D0D6E0"
+            android:backgroundTint="#2A3242"
+            android:drawablePadding="4dp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/tvPnL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="₹-66758.00"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:textColor="#FF4B55" />
+    </LinearLayout>
+
+
+    <!-- Row 2: Buy/Sell Icon + Entry -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical">
+
+        <!-- Buy/Sell Box -->
+        <TextView
+            android:id="@+id/tvBuySell"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:gravity="center"
+            android:text="B"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:background="@drawable/bg_circle_green"
+            android:backgroundTint="#128C4F"
+            android:layout_marginEnd="10dp" />
+
+        <TextView
+            android:id="@+id/tvEntry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1   @   ₹2471399.00"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tvTradeDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="04 Feb 2026, 10:17 am"
+            android:textColor="@color/black"
+            android:textSize="13sp"
+            android:gravity="end" />
+    </LinearLayout>
+
+
+    <!-- Row 3: Exit -->
+    <TextView
+        android:id="@+id/tvExit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Exit @ ₹2404641.00"
+        android:textColor="@color/black"
+        android:layout_marginTop="4dp"
+        android:textSize="14sp" />
+
+    <!-- Row 4: Qty & Brokerage -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="3dp">
+
+        <TextView
+            android:id="@+id/tvQty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Qty: 1"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvBrokerage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="Brokerage: ₹100.00"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:background="#1E2633" />
+
+</LinearLayout>

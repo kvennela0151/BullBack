@@ -20,15 +20,5 @@ class PositionsRepository {
             throw Exception("API failed: ${response.code()} ${response.message()}")
         }
     }
-
-    suspend fun exitAllPositions(list: List<String>): Response<ExitAllResponse> {
-        val request = ExitAllRequest(
-            mode = "symbols",
-            symbols = list
-        )
-        return api.exitAllPositions(request)
-    }
-
-
 }
 

@@ -201,7 +201,7 @@
 
             <Button
                 android:layout_width="70dp"
-                android:layout_height="35dp"
+                android:layout_height="48dp"
                 android:id="@+id/bntExitAll"
                 android:text="EXIT ALL"
                 android:textStyle="bold"

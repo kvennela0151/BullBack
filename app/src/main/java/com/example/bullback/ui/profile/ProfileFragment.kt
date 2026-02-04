@@ -11,6 +11,7 @@ import com.example.bullback.R
 import com.example.bullback.data.model.auth.User
 import com.example.bullback.databinding.FragmentProfileBinding
 import com.example.bullback.ui.profile.marginSettings.MarginSettingsFragment
+import com.example.bullback.ui.profile.tradelogs.TradeLogsFragment
 import com.example.bullback.ui.profile.wallet.WalletFragment
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -39,6 +40,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             navigateToFragment(MarginSettingsFragment())
         }
 
+        //trade logs navigation
+        binding.option4.setOnClickListener {
+            navigateToFragment(TradeLogsFragment())
+        }
         observeState()
     }
 
