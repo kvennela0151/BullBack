@@ -35,7 +35,7 @@
         app:boxCornerRadiusTopEnd="10dp"
         app:boxCornerRadiusBottomStart="10dp"
         app:boxCornerRadiusBottomEnd="10dp"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="1dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etAmount"
@@ -45,6 +45,15 @@
             android:inputType="number"
             android:padding="14dp"/>
     </com.google.android.material.textfield.TextInputLayout>
+    <!-- TextView below amount -->
+    <TextView
+        android:id="@+id/tvMaxAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Maximum withdrawal: ₹0.00"
+        android:textColor="@color/black"
+        android:layout_marginBottom="6dp"
+        android:textSize="14sp" />
 
     <!-- UPI Mobile -->
     <TextView
@@ -53,6 +62,7 @@
         android:text="UPI Mobile (optional)"
         android:textSize="14sp"
         android:textColor="@color/black"
+        android:layout_marginTop="2dp"
         android:layout_marginBottom="6dp"/>
 
     <com.google.android.material.textfield.TextInputLayout
