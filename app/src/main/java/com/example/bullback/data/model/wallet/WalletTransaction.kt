@@ -7,6 +7,9 @@ data class WalletTransaction(
     val amount: String,
     val type: String,
     val status: String,
+    @SerializedName("screenshot_url")
+    val screenshotUrl: String? = null,
+
 
     @SerializedName("admin_remark")
     val adminRemark: String?,

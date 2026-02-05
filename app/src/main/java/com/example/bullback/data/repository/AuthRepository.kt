@@ -3,6 +3,7 @@ package com.example.bullback.data.repository
 import android.content.Context
 import android.util.Log
 import com.example.bullback.data.model.auth.*
+
 import com.example.bullback.data.model.watchlist.WatchlistResponse
 import com.example.bullback.data.remote.RetrofitClient
 import com.example.bullback.data.remote.api.AuthApi
@@ -172,6 +173,7 @@ class AuthRepository private constructor(
     }
 
 
+
     suspend fun getProfile(): Resource<UserMeResponse> {
         return try {
             val response = authApi.getProfile()
@@ -232,4 +234,5 @@ class AuthRepository private constructor(
             }
         }
     }
+
 }

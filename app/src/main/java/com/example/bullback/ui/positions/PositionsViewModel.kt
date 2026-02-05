@@ -7,10 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.bullback.data.model.positions.PositionsItem
 import com.example.bullback.data.model.positions.exitall.ExitAllResponse
 import com.example.bullback.data.repository.PositionsRepository
+import com.example.bullback.utlis.FinanceCalculator
 import kotlinx.coroutines.launch
 
 // PositionsViewModel.kt
-class PositionsViewModel(
+open class PositionsViewModel(
     private val repository: PositionsRepository = PositionsRepository()
 ) : ViewModel() {
 
@@ -24,6 +25,11 @@ class PositionsViewModel(
 
     private val _exitAllResponse = MutableLiveData<ExitAllResponse?>()
     val exitAllResponse: LiveData<ExitAllResponse?> = _exitAllResponse
+
+    val livePrices = mutableMapOf<String, Double>()
+
+    val totalPnl = MutableLiveData<Double>()
+    val utilisedFunds = MutableLiveData<Double>()
 
 
     fun setStatus(status: String) {
@@ -41,6 +47,24 @@ class PositionsViewModel(
                 _positions.value = emptyList()
             }
         }
+    }
+
+    fun recalcAll() {
+        val list = positions.value ?: return
+
+        // TOTAL PNL
+        val pnl = FinanceCalculator.calculateTotalPnl(list, livePrices)
+        totalPnl.postValue(pnl)
+
+        // UTILISED FUNDS
+        val utilised = FinanceCalculator.calculateUtilisedFunds(list)
+        utilisedFunds.postValue(utilised)
+    }
+
+    fun recalcTotalPnl() {
+        val list = positions.value ?: return
+        val pnl = FinanceCalculator.calculateTotalPnl(list, livePrices)
+        totalPnl.postValue(pnl)
     }
 }
 

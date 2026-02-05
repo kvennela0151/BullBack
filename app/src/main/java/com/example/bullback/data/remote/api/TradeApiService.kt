@@ -8,10 +8,13 @@ import retrofit2.http.Query
 interface TradeApiService {
 
     @GET("api/v1/trade/positions")
-    suspend fun getClosedPositions(
+    suspend fun getTradePositions(
         @Query("status") status: String = "CLOSED",
-        @Query("page") page: Int,
-        @Query("limit") limit: Int
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 20,
+        @Query("startDate") startDate: String? = null,
+        @Query("endDate") endDate: String? = null
     ): Response<TradePositionsResponse>
+
 
 }

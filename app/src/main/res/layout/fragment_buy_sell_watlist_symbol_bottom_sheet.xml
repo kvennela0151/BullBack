@@ -333,7 +333,7 @@
         <TextView
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:id="@+id/tvIntraday"
+            android:id="@+id/tvIntradayMargin"
             android:layout_weight="1"
             android:text="Intraday: 25379.9"
             android:textSize="12sp"
@@ -342,7 +342,7 @@
         <TextView
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:id="@+id/tvCarry"
+            android:id="@+id/tvCarryMargin"
             android:layout_weight="1"
             android:text="Carry: 25379.9"
             android:textSize="12sp"
@@ -351,7 +351,7 @@
         <TextView
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:id="@+id/tvAvialFunds"
+            android:id="@+id/tvAvailableMargin"
             android:layout_weight="1"
             android:text="Avail. Funds: 25268.2"
             android:textSize="12sp"

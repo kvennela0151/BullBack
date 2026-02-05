@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -12,8 +13,10 @@ import com.example.bullback.data.model.wallet.WalletTransaction
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class WalletTransactionAdapter :
-    RecyclerView.Adapter<WalletTransactionAdapter.TransactionViewHolder>() {
+class WalletTransactionAdapter(
+    private val onViewScreenshot: (WalletTransaction) -> Unit,
+    private val onEditRequest: (WalletTransaction) -> Unit
+) : RecyclerView.Adapter<WalletTransactionAdapter.TransactionViewHolder>() {
 
     private val items = mutableListOf<WalletTransaction>()
 
@@ -31,6 +34,11 @@ class WalletTransactionAdapter :
         val tvAmount: TextView = view.findViewById(R.id.tvAmount)
         val tvStatus: TextView = view.findViewById(R.id.tvStatus)
         val tvRemark: TextView = view.findViewById(R.id.tvRemark)
+
+        val layoutActions: View = view.findViewById(R.id.layoutActions)
+        val btnViewScreenshot: Button = view.findViewById(R.id.btnViewScreenshot)
+        val btnEditRequest: Button = view.findViewById(R.id.btnEditRequest)
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
@@ -54,6 +62,8 @@ class WalletTransactionAdapter :
         // Date formatting
         holder.tvDate.text = formatDate(item.createdAt)
 
+
+
         // Remark
         if (item.adminRemark.isNullOrEmpty()) {
             holder.tvRemark.visibility = View.GONE
@@ -69,6 +79,19 @@ class WalletTransactionAdapter :
         } else {
             holder.ivIcon.setImageResource(R.drawable.ic_arrow_right)
             holder.tvStatus.setTextColor(Color.parseColor("#D32F2F")) // red
+        }
+
+        // ⭐ Show actions ONLY for the LAST pending deposit
+        val showButtons = position == 0 && item.type == "DEPOSIT" && item.status == "PENDING"
+
+        holder.layoutActions.visibility = if (showButtons) View.VISIBLE else View.GONE
+
+        holder.btnViewScreenshot.setOnClickListener {
+            onViewScreenshot(item)
+        }
+
+        holder.btnEditRequest.setOnClickListener {
+            onEditRequest(item)
         }
     }
 

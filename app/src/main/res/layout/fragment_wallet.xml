@@ -119,6 +119,7 @@
                             android:layout_height="wrap_content"/>
 
                         <TextView
+                            android:id="@+id/tvUtilisedFunds"
                             android:text="₹16,760"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -144,6 +145,7 @@
                             android:layout_height="wrap_content"/>
 
                         <TextView
+                            android:id="@+id/tvMtmValue"
                             android:text="₹-40,313"
                             android:textColor="@color/black"
                             android:textSize="16sp"

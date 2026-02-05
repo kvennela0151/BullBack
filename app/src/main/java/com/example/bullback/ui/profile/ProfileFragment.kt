@@ -10,6 +10,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.bullback.R
 import com.example.bullback.data.model.auth.User
 import com.example.bullback.databinding.FragmentProfileBinding
+import com.example.bullback.ui.profile.changepassword.ChangePasswordBottomSheet
 import com.example.bullback.ui.profile.marginSettings.MarginSettingsFragment
 import com.example.bullback.ui.profile.tradelogs.TradeLogsFragment
 import com.example.bullback.ui.profile.wallet.WalletFragment
@@ -44,6 +45,16 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         binding.option4.setOnClickListener {
             navigateToFragment(TradeLogsFragment())
         }
+
+        binding.option2.setOnClickListener {
+            ChangePasswordBottomSheet().show(parentFragmentManager, ChangePasswordBottomSheet.TAG)
+        }
+
+        binding.btnChatNow.setOnClickListener {
+            openWhatsApp("+919214784402")
+        }
+
+
         observeState()
     }
 
@@ -97,6 +108,25 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             "N/A"
         }
     }
+
+    private fun openWhatsApp(number: String) {
+        try {
+            val uri = android.net.Uri.parse("https://wa.me/$number")
+            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, uri)
+            intent.setPackage("com.whatsapp")  // Force open in WhatsApp app
+
+            if (intent.resolveActivity(requireContext().packageManager) != null) {
+                startActivity(intent)
+            } else {
+                // If WhatsApp not installed, open in browser
+                startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, uri))
+            }
+
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Unable to open WhatsApp", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     private fun navigateToFragment(fragment: Fragment) {
         requireActivity().supportFragmentManager.beginTransaction()

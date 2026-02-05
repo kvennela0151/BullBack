@@ -94,6 +94,42 @@
         android:padding="10dp"
         android:layout_marginTop="12dp"/>
 
+    <!-- Buttons (Hidden by default) -->
+    <LinearLayout
+        android:id="@+id/layoutActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:visibility="gone"
+        android:paddingTop="10dp">
+
+        <Button
+            android:id="@+id/btnViewScreenshot"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="View Screenshot"
+            android:backgroundTint="@color/black"
+            android:textColor="@color/white"/>
+
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/btnEditRequest"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="Edit Request"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/black"/>
+
+    </LinearLayout>
+
+
+
     <!-- Divider -->
     <View
         android:layout_width="match_parent"

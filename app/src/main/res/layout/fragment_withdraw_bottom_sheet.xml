@@ -38,6 +38,7 @@
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter withdrawal amount"
@@ -65,6 +66,7 @@
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etUpi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter UPI linked mobile"
@@ -92,6 +94,7 @@
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Account holder name"
@@ -119,6 +122,7 @@
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etAccNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Bank account number"
@@ -146,6 +150,7 @@
         android:layout_marginBottom="24dp">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etIfsc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="IFSC code"
@@ -161,6 +166,7 @@
         android:weightSum="2">
 
         <Button
+            android:id="@+id/btnCancel"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
@@ -173,6 +179,7 @@
             android:layout_height="wrap_content"/>
 
         <Button
+            android:id="@+id/btnSubmit"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"

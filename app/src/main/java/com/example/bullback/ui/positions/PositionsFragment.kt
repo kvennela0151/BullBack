@@ -135,7 +135,7 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
             }
         }
 
-        viewModel.openPnl.observe(viewLifecycleOwner) { pnl ->
+        viewModel.totalPnl.observe(viewLifecycleOwner) { pnl ->
             binding.tvOpenPnl.text = String.format("%.2f", pnl)
             binding.tvOpenPnl.setTextColor(
                 if (pnl >= 0) Color.parseColor("#2E7D32")

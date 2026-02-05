@@ -29,4 +29,5 @@
     <string name="market">Market</string>
     <string name="empty_open_orders">empty open oders\n</string>
     <string name="click_to_upload_or_drag_drop"><![CDATA[Click to upload or drag & drop]]></string>
+    <string name="trade_500x_margins_nwith_bullmargin">Trade 500x Margins\nWith BullMargin</string>
 </resources>

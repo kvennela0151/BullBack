@@ -56,14 +56,17 @@
 
             <EditText
                 android:id="@+id/startDate"
-                android:hint="20"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:hint="Select Date"
                 android:background="@drawable/bg_input_box"
-                android:padding="12dp"
                 android:drawableEnd="@drawable/ic_calendar"
                 android:textColor="@android:color/white"
-                android:textColorHint="#7A8595" />
+                android:focusable="false"
+                android:cursorVisible="false"
+                android:textColorHint="#7A8595"
+                android:padding="12dp" />
+
 
             <!-- End Date + Results -->
             <LinearLayout
@@ -89,12 +92,15 @@
                         android:id="@+id/endDate"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:hint="15"
+                        android:hint="Select Date"
                         android:background="@drawable/bg_input_box"
                         android:drawableEnd="@drawable/ic_calendar"
                         android:textColor="@android:color/white"
+                        android:focusable="false"
+                        android:cursorVisible="false"
                         android:textColorHint="#7A8595"
                         android:padding="12dp" />
+
                 </LinearLayout>
 
                 <Space
@@ -122,8 +128,11 @@
                         android:background="@drawable/bg_input_box"
                         android:drawableEnd="@drawable/ic_drop"
                         android:textColor="@android:color/white"
+                        android:focusable="false"
+                        android:cursorVisible="false"
                         android:textColorHint="#7A8595"
                         android:padding="12dp" />
+
                 </LinearLayout>
 
             </LinearLayout>

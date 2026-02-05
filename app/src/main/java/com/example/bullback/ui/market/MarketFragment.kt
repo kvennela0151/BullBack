@@ -254,6 +254,3 @@ class MarketFragment : Fragment() {
 
 
 }
-
-
-

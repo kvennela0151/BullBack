@@ -5,11 +5,11 @@ import com.example.bullback.data.remote.api.TradeApiService
 
 class TradeRepository(private val api: TradeApiService) {
 
-    suspend fun getClosedTrades(page: Int, limit: Int): List<TradeItem> {
-        val res = api.getClosedPositions("CLOSED", page, limit)
+    suspend fun getClosedTrades(limit: Int) =
+        api.getTradePositions(limit = limit)
 
-        return if (res.isSuccessful) {
-            res.body()?.data?.positions ?: emptyList()
-        } else emptyList()
-    }
+    suspend fun getFilteredTrades(start: String?, end: String?, limit: Int) =
+        api.getTradePositions(startDate = start, endDate = end, limit = limit)
+
+
 }

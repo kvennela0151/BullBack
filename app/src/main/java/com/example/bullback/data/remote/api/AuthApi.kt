@@ -9,6 +9,7 @@ import com.example.bullback.data.model.auth.User
 import com.example.bullback.data.model.auth.UserMeResponse
 import okhttp3.RequestBody
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -47,5 +48,6 @@ interface AuthApi {
 
     @GET("api/v1/users/me")
     suspend fun getProfile(): Response<ApiResponse<UserMeResponse>>
+
 
 }
