@@ -6,25 +6,31 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.bullback.databinding.FragmentBuySellWatlistSymbolBottomSheetBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-
 import androidx.core.content.ContextCompat
 import com.example.bullback.R
 import com.example.bullback.data.model.websocket.AppWebSocketManager
 import org.json.JSONObject
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import com.example.bullback.data.model.placeorders.PlaceOrderRequest
+import com.example.bullback.data.repository.OrdersRepository
+import com.example.bullback.utlis.Resource
+import kotlinx.coroutines.launch
 
 class BuySellWatlistSymbolBottomSheet(
     private val symbol: String,
     private val segment: String,
     private var ltp: Double,
     private val orderType: String, // "BUY" or "SELL"
-    private val token: String // Add token parameter
+    private val token: String,
+    private val exchange: String
 ) : BottomSheetDialogFragment() {
 
     private var _binding: FragmentBuySellWatlistSymbolBottomSheetBinding? = null
     private val binding get() = _binding!!
 
-    // Track if we're already subscribed
     private var isSubscribed = false
+    private val ordersRepository = OrdersRepository()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,21 +43,17 @@ class BuySellWatlistSymbolBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initial UI setup
         binding.tvSymbol.text = symbol
         binding.tvSegment.text = segment
         binding.tvLtp.text = String.format("%.2f", ltp)
         binding.etPrice.setText(ltp.toString())
 
-        // Subscribe to real-time updates
         subscribeToUpdates()
 
-        // Toggle Stoploss & Target fields
         binding.switchSL.setOnCheckedChangeListener { _, isChecked ->
             binding.layoutStoplossTarget.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
 
-        // Tab selection listener (Market/Limit)
         binding.tabLayout.addOnTabSelectedListener(object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
                 when (tab?.position) {
@@ -69,7 +71,6 @@ class BuySellWatlistSymbolBottomSheet(
             override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {}
         })
 
-        // Place Order
         binding.btnPlaceOrder.text = if (orderType == "BUY") "Buy" else "Sell"
         binding.btnPlaceOrder.backgroundTintList = ContextCompat.getColorStateList(
             requireContext(),
@@ -77,67 +78,142 @@ class BuySellWatlistSymbolBottomSheet(
         )
 
         binding.btnPlaceOrder.setOnClickListener {
-            val price = binding.etPrice.text.toString()
-            val lots = binding.etLots.text.toString()
-            val stoploss = binding.etStoploss.text.toString()
-            val target = binding.etTarget.text.toString()
-
-            // TODO: Call API or handle BUY/SELL order
-            dismiss()
+            placeOrder()
         }
 
-        // Back button
         binding.btnBack.setOnClickListener {
             dismiss()
         }
     }
 
+    private fun placeOrder() {
+        val priceText = binding.etPrice.text.toString()
+        val lotsText = binding.etLots.text.toString()
+
+        if (lotsText.isEmpty()) {
+            Toast.makeText(requireContext(), "Please enter lots", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val lots = lotsText.toDoubleOrNull()
+        if (lots == null || lots <= 0) {
+            Toast.makeText(requireContext(), "Please enter valid lots", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val selectedOrderType = when (binding.tabLayout.selectedTabPosition) {
+            0 -> "MARKET"
+            1 -> "LIMIT"
+            else -> "MARKET"
+        }
+
+        val price: Double? = if (selectedOrderType == "LIMIT") {
+            val parsedPrice = priceText.toDoubleOrNull()
+            if (parsedPrice == null || parsedPrice <= 0) {
+                Toast.makeText(requireContext(), "Please enter valid price", Toast.LENGTH_SHORT).show()
+                return
+            }
+            parsedPrice
+        } else {
+            null
+        }
+
+        val stoploss = if (binding.switchSL.isChecked) {
+            binding.etStoploss.text.toString().toDoubleOrNull()
+        } else null
+
+        val target = if (binding.switchSL.isChecked) {
+            binding.etTarget.text.toString().toDoubleOrNull()
+        } else null
+
+        val lotSize = getLotSize(segment, symbol)
+        val quantity = (lots * lotSize).toInt()
+
+        val request = PlaceOrderRequest(
+            transaction_type = orderType,
+            order_type = selectedOrderType,
+            quantity = quantity,
+            lots = lotsText,
+            price = price,
+            stoploss = stoploss,
+            target = target,
+            exchange = exchange,
+            instrument_token = token,
+            symbol = symbol,
+            product_type = "MIS"
+        )
+
+        binding.btnPlaceOrder.isEnabled = false
+        binding.btnPlaceOrder.text = "Placing..."
+
+        lifecycleScope.launch {
+            when (val result = ordersRepository.placeOrder(request)) {
+                is Resource.Success -> {
+                    val response = result.data
+                    Toast.makeText(
+                        requireContext(),
+                        "Order placed successfully! Order ID: ${response.data.id}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    dismiss()
+                }
+                is Resource.Error -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Failed: ${result.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    binding.btnPlaceOrder.isEnabled = true
+                    binding.btnPlaceOrder.text = if (orderType == "BUY") "Buy" else "Sell"
+                }
+                is Resource.Loading -> {
+                    // Already showing loading state
+                }
+            }
+        }
+    }
+
+    private fun getLotSize(segment: String, symbol: String): Int {
+        return when {
+            segment.contains("NFO", ignoreCase = true) && symbol.contains("NIFTY", ignoreCase = true) -> {
+                when {
+                    symbol.contains("BANKNIFTY", ignoreCase = true) -> 15
+                    symbol.contains("FINNIFTY", ignoreCase = true) -> 25
+                    symbol.contains("MIDCPNIFTY", ignoreCase = true) -> 50
+                    else -> 25
+                }
+            }
+            segment.contains("MCX", ignoreCase = true) -> 1
+            segment.contains("CRYPTO", ignoreCase = true) -> 1
+            segment.contains("COMEX", ignoreCase = true) -> 1
+            else -> 1
+        }
+    }
+
     private fun subscribeToUpdates() {
         AppWebSocketManager.setMarketListener { json ->
-            android.util.Log.d("BuySellSheet", "Received WebSocket message: $json")
+            if (json.optString("type") != "market_data") return@setMarketListener
 
-            if (json.optString("type") != "market_data") {
-                android.util.Log.d("BuySellSheet", "Not market_data type, ignoring")
-                return@setMarketListener
-            }
+            val data = json.optJSONObject("data") ?: return@setMarketListener
 
-            val data = json.optJSONObject("data")
-            if (data == null) {
-                android.util.Log.d("BuySellSheet", "No data object found")
-                return@setMarketListener
-            }
-
-            // Determine if this update is for our symbol/token
             val incomingToken: String?
             val isForUs: Boolean
 
             if (data.has("Token")) {
-                // Index/MCX format - match by numeric token
                 incomingToken = data.optLong("Token").toString()
                 isForUs = incomingToken == token
-                android.util.Log.d("BuySellSheet", "Index/MCX: incoming=$incomingToken, our=$token, match=$isForUs")
             } else if (data.has("instrument_token")) {
-                // Crypto/Comex format - match by instrument_token as symbol
                 incomingToken = data.optString("instrument_token")
-                // Check both token and symbol for flexibility
                 isForUs = incomingToken == token || incomingToken == symbol
-                android.util.Log.d("BuySellSheet", "Crypto: incoming=$incomingToken, our=$token, symbol=$symbol, match=$isForUs")
             } else {
-                android.util.Log.d("BuySellSheet", "No Token or instrument_token field found")
                 return@setMarketListener
             }
 
-            if (!isForUs) {
-                android.util.Log.d("BuySellSheet", "Update not for us, ignoring")
-                return@setMarketListener
-            }
+            if (!isForUs) return@setMarketListener
 
-            android.util.Log.d("BuySellSheet", "Update is for us! Updating UI with data: $data")
-            // Extract and update UI
             updateUI(data)
         }
 
-        // Send subscription only once
         if (!isSubscribed) {
             val subscribe = JSONObject().apply {
                 put("type", "subscribe")
@@ -145,14 +221,12 @@ class BuySellWatlistSymbolBottomSheet(
                     put(token)
                 })
             }
-            android.util.Log.d("BuySellSheet", "Subscribing to token: $token with message: $subscribe")
             AppWebSocketManager.sendMessage(subscribe.toString())
             isSubscribed = true
         }
     }
 
     private fun updateUI(data: JSONObject) {
-        // Extract LTP
         val newLtp = when {
             data.has("LTP") -> data.optDouble("LTP")
             data.has("ltp") -> data.optDouble("ltp")
@@ -160,24 +234,18 @@ class BuySellWatlistSymbolBottomSheet(
             else -> 0.0
         }
 
-        // Update the class-level ltp variable
         if (newLtp > 0) {
             this.ltp = newLtp
         }
 
-        // Extract Bid/Ask
         var bid = 0.0
         var ask = 0.0
 
         try {
-            // Check if we have direct bid/ask fields first (Crypto/Comex format)
             if (data.has("bid") || data.has("ask")) {
                 bid = data.optDouble("bid", 0.0)
                 ask = data.optDouble("ask", 0.0)
-            }
-            // Otherwise check for Buy/Sell arrays (Index/MCX format)
-            else if (data.has("Buy") && data.has("Sell")) {
-                // Bid is the highest buying price (from Buy array)
+            } else if (data.has("Buy") && data.has("Sell")) {
                 val buyArray = data.optJSONArray("Buy")
                 if (buyArray != null && buyArray.length() > 0) {
                     var maxBid = 0.0
@@ -189,7 +257,6 @@ class BuySellWatlistSymbolBottomSheet(
                     bid = maxBid
                 }
 
-                // Ask is the lowest selling price (from Sell array)
                 val sellArray = data.optJSONArray("Sell")
                 if (sellArray != null && sellArray.length() > 0) {
                     var minAsk = Double.MAX_VALUE
@@ -202,55 +269,44 @@ class BuySellWatlistSymbolBottomSheet(
                 }
             }
         } catch (e: Exception) {
-            // Fallback to direct fields if arrays not available
             bid = data.optDouble("bid", 0.0)
             ask = data.optDouble("ask", 0.0)
         }
 
-        // Extract OHLC
         val open = data.optDouble("O", data.optDouble("open", 0.0))
         val high = data.optDouble("H", data.optDouble("high", 0.0))
         val low = data.optDouble("L", data.optDouble("low", 0.0))
         val close = data.optDouble("C", data.optDouble("close", 0.0))
 
-        // Calculate change - handle both formats
         val change: Double
         val changePercent: Double
 
         if (data.has("change") && data.has("change_percent")) {
-            // Crypto/Comex format - use provided change values
             change = data.optDouble("change", 0.0)
             changePercent = data.optDouble("change_percent", 0.0)
         } else {
-            // Index/MCX format - calculate from close price
             val previousClose = close
             change = newLtp - previousClose
             changePercent = if (previousClose != 0.0) (change / previousClose) * 100 else 0.0
         }
 
-        // Extract expiry date if available
         val expiryDate = data.optString("expiry_date", "")
 
-        // Update UI on main thread
         requireActivity().runOnUiThread {
-            // Determine decimal places based on price magnitude
             val decimalPlaces = when {
-                newLtp < 1.0 -> 6      // For very small values like 0.000123
-                newLtp < 10.0 -> 5     // For small values like 5.12345
-                newLtp < 100.0 -> 5    // For medium values like 17.10061
-                newLtp < 1000.0 -> 2   // For higher values like 117.60
-                else -> 2              // For large values like 25343.00
+                newLtp < 1.0 -> 6
+                newLtp < 10.0 -> 5
+                newLtp < 100.0 -> 5
+                newLtp < 1000.0 -> 2
+                else -> 2
             }
 
-            // Update LTP
             binding.tvLtp.text = String.format("%.${decimalPlaces}f", newLtp)
 
-            // Update Price field if in Market mode (tab 0)
             if (binding.tabLayout.selectedTabPosition == 0) {
                 binding.etPrice.setText(String.format("%.${decimalPlaces}f", newLtp))
             }
 
-            // Update Bid/Ask (combined field)
             val bidAskText = if (bid > 0 && ask > 0) {
                 "Bid: %.${decimalPlaces}f   Ask: %.${decimalPlaces}f".format(bid, ask)
             } else {
@@ -258,18 +314,15 @@ class BuySellWatlistSymbolBottomSheet(
             }
             binding.tvBidAsk.text = bidAskText
 
-            // Update OHLC
             binding.tvOpen.text = "O: %.${decimalPlaces}f".format(open)
             binding.tvHigh.text = "H: %.${decimalPlaces}f".format(high)
             binding.tvLow.text = "L: %.${decimalPlaces}f".format(low)
             binding.tvClose.text = "C: %.${decimalPlaces}f".format(close)
 
-            // Update Date/Expiry
             if (expiryDate.isNotEmpty()) {
                 binding.tvDate.text = expiryDate
             }
 
-            // Update Change
             val changeDecimalPlaces = if (Math.abs(change) < 1.0) decimalPlaces else 2
             val changeFormatted = if (change >= 0) {
                 String.format("+%.${changeDecimalPlaces}f", change)
@@ -280,7 +333,6 @@ class BuySellWatlistSymbolBottomSheet(
 
             binding.tvChange.text = "$changeFormatted ($percentFormatted%)"
 
-            // Update colors
             val color = if (change >= 0)
                 ContextCompat.getColor(requireContext(), R.color.button_green_dark)
             else
@@ -295,7 +347,6 @@ class BuySellWatlistSymbolBottomSheet(
     override fun onDestroyView() {
         super.onDestroyView()
 
-        // Unsubscribe when bottom sheet is closed
         if (isSubscribed) {
             val unsubscribe = JSONObject().apply {
                 put("type", "unsubscribe")

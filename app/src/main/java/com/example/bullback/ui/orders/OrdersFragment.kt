@@ -13,8 +13,7 @@ import com.example.bullback.databinding.FragmentOrdersBinding
 import com.example.bullback.utlis.Resource
 import com.google.android.material.tabs.TabLayout
 
-
-class OrdersFragment : Fragment() {
+class   OrdersFragment : Fragment() {
 
     private var _binding: FragmentOrdersBinding? = null
     private val binding get() = _binding!!
