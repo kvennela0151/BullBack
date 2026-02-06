@@ -16,6 +16,10 @@ import org.json.JSONObject
 import android.util.Log
 import com.example.bullback.data.model.positions.PositionsItem
 
+import android.widget.Toast
+import com.example.bullback.utlis.Resource
+
+
 class PositionsFragment : Fragment(R.layout.fragment_positions) {
 
     private var _binding: FragmentPositionsBinding? = null
@@ -26,7 +30,7 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
     private lateinit var authRepository: AuthRepository
 
     private var currentTokens: List<String> = emptyList()
-    private var currentTab: String = "OPEN" // Track current tab
+    private var currentTab: String = "OPEN"
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -40,7 +44,6 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
         setupExitAllButton()
         observeData()
 
-        // Load default tab (Open)
         viewModel.setStatus("OPEN")
     }
 
@@ -49,7 +52,6 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
     }
 
     private fun setupRecyclerView() {
-        // Pass click listener to adapter
         adapter = PositionsAdapter { position ->
             onPositionClicked(position)
         }
@@ -87,15 +89,12 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
     private fun showOpenPnlCard(show: Boolean) {
         binding.cardOpenPnl.visibility = if (show) View.VISIBLE else View.GONE
 
-        // Also adjust the RecyclerView constraints based on PNL card visibility
         val params = binding.rvPositions.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
 
         if (show) {
-            // When PNL card is visible, position RecyclerView below it
             params.topToBottom = R.id.cardOpenPnl
             params.topToTop = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
         } else {
-            // When PNL card is hidden, position RecyclerView below TabLayout
             params.topToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
             params.topToTop = R.id.tabLayoutPositions
         }
@@ -105,31 +104,22 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
 
     private fun setupExitAllButton() {
         binding.btnExitAll.setOnClickListener {
-            // Show confirmation dialog first
-            android.app.AlertDialog.Builder(requireContext())
-                .setTitle("Exit All Positions?")
-                .setMessage("Are you sure you want to squareoff all positions?")
-                .setPositiveButton("Exit All") { _, _ ->
-                    exitAllPositions()
+            // Show exit confirmation bottom sheet
+            val exitBottomSheet = ExitPositionBottomSheetFragment(
+                isExitAll = true,
+                onConfirm = {
+                    viewModel.squareOffAllPositions()
                 }
-                .setNegativeButton("Cancel", null)
-                .show()
+            )
+            exitBottomSheet.show(parentFragmentManager, "ExitAllPositions")
         }
-    }
-
-    private fun exitAllPositions() {
-        // Loop through all positions and place market sell orders
-        Log.d("PositionsFragment", "Exit all positions clicked")
     }
 
     private fun observeData() {
         viewModel.positions.observe(viewLifecycleOwner) { positions ->
             adapter.submitList(positions)
-
-            // Subscribe to WebSocket for all positions
             subscribeWebSocket(positions.map { it.instrumentToken })
 
-            // Update total PNL only if in Open tab
             if (currentTab == "OPEN") {
                 updateTotalPnL()
             }
@@ -142,10 +132,44 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
                 else Color.parseColor("#C62828")
             )
         }
+
+        // Observe square off result
+        viewModel.squareOffResult.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    // Show loading indicator if needed
+                }
+                is Resource.Success -> {
+                    val response = resource.data
+                    if (response.status) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Successfully exited ${response.data.success} position(s)",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        // Refresh positions
+                        viewModel.refreshPositions()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Failed to exit positions: ${response.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+                is Resource.Error -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Error: ${resource.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
     }
 
-    private fun onPositionClicked(position: com.example.bullback.data.model.positions.PositionsItem) {
-        // Open bottom sheet with position details
+    private fun onPositionClicked(position: PositionsItem) {
         val bottomSheet = PositionDetailsBottomSheet(position)
         bottomSheet.show(parentFragmentManager, "PositionDetailsBottomSheet")
     }
@@ -167,28 +191,23 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
         val token = authRepository.getTokenSync()
         token?.let { AppWebSocketManager.connect(it) }
 
-        // Set up WebSocket listener for real-time position updates
         AppWebSocketManager.setMarketListener { json ->
             if (json.optString("type") != "market_data") return@setMarketListener
             val data = json.optJSONObject("data") ?: return@setMarketListener
 
-            // Extract token/identifier based on available fields
             val token: String?
             val symbol: String?
 
             if (data.has("Token")) {
-                // For index/MCX - use numeric token
                 token = data.optLong("Token").toString()
                 symbol = null
             } else if (data.has("instrument_token")) {
-                // For crypto/comex - use instrument_token as symbol
                 token = null
                 symbol = data.optString("instrument_token")
             } else {
                 return@setMarketListener
             }
 
-            // Extract price data
             val ltp: Double = when {
                 data.has("LTP") -> data.optDouble("LTP")
                 data.has("ltp") -> data.optDouble("ltp")
@@ -198,32 +217,27 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
 
             if (ltp == 0.0) return@setMarketListener
 
-            // Extract change for PNL calculation
             val change: Double
             val changePercent: Double
             val closePrice: Double
 
             if (data.has("C")) {
-                // Index/MCX format
                 closePrice = data.optDouble("C")
                 change = ltp - closePrice
                 changePercent = if (closePrice != 0.0) (change / closePrice) * 100 else 0.0
             } else {
-                // Crypto/comex format
                 change = data.optDouble("change")
                 changePercent = data.optDouble("change_percent")
                 closePrice = data.optDouble("close")
             }
 
             requireActivity().runOnUiThread {
-                // Update adapter with live price
                 if (token != null) {
                     adapter.updateLivePrice(token, ltp, change, changePercent)
                 } else if (symbol != null) {
                     adapter.updateLivePriceBySymbol(symbol, ltp, change, changePercent)
                 }
 
-                // Recalculate and update total open PNL only if in Open tab
                 if (currentTab == "OPEN") {
                     updateTotalPnL()
                 }
@@ -237,7 +251,6 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
     }
 
     private fun updateTotalPnL() {
-        // Recalculate total PNL from all positions
         var totalPnl = 0.0
 
         adapter.getCurrentItems().forEach { position ->
@@ -252,17 +265,14 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
     }
 
     private fun calculatePnlForPosition(position: PositionsItem): Double {
-        // Parse values
         val netQty = position.netQuantity.toDoubleOrNull() ?: 0.0
         val avgPrice = position.averagePrice.toDoubleOrNull() ?: 0.0
         val realizedPnl = position.realizedPnl.toDoubleOrNull() ?: 0.0
 
-        // 1️ Closed position → backend truth wins
         if (netQty == 0.0) {
             return realizedPnl
         }
 
-        // 2️Open position → calculate unrealized
         val currentLtp = adapter.getLivePriceForPosition(position.instrumentToken) ?: avgPrice
 
         if (currentLtp == 0.0) {
@@ -273,13 +283,11 @@ class PositionsFragment : Fragment(R.layout.fragment_positions) {
         val entryPrice = avgPrice
         var unrealized = 0.0
 
-        // Calculate P&L based on side
         if (position.side == "BUY") {
             unrealized = (currentLtp - entryPrice) * openQty
         } else if (position.side == "SELL") {
             unrealized = (entryPrice - currentLtp) * openQty
         } else {
-            // Default calculation if side is unknown
             unrealized = (currentLtp - entryPrice) * netQty
         }
 

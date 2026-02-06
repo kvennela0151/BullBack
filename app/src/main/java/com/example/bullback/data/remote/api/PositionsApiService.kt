@@ -4,6 +4,7 @@ import com.example.bullback.data.model.positions.PositionsResponse
 import com.example.bullback.data.model.positions.exitall.ExitAllRequest
 import com.example.bullback.data.model.positions.exitall.ExitAllResponse
 import com.example.bullback.data.model.positions.exitall.SquareOffRequest
+import com.example.bullback.data.model.positions.squareoff.SquareOffResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -18,5 +19,8 @@ interface PositionsApiService {
         @Query("status") status: String
     ): Response<PositionsResponse>
 
-
+    @POST("/api/v1/trade/positions/square-off")
+    suspend fun squareOffPositions(
+        @Body request: SquareOffRequest
+    ): SquareOffResponse
 }

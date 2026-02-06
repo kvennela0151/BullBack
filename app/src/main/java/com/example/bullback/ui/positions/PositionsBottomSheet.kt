@@ -12,6 +12,7 @@ import com.example.bullback.data.model.websocket.AppWebSocketManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.json.JSONObject
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
 import com.example.bullback.databinding.FragmentPositionsBottomSheetBinding
 import kotlin.math.abs
 
@@ -131,15 +132,18 @@ class PositionDetailsBottomSheet(
         }
     }
 
+    // In the exitEntirePosition() method:
+
     private fun exitEntirePosition() {
-        // TODO: Implement exit entire position API call
-        Log.d("PositionDetailsSheet", "Exiting entire position for ${position.symbol}")
-
-        // Close the bottom sheet
-        dismiss()
-
-        // Optionally, refresh positions in the parent fragment
-        // You can use a callback or shared ViewModel for this
+        val exitBottomSheet = ExitPositionBottomSheetFragment(
+            isExitAll = false,
+            onConfirm = {
+                val viewModel = ViewModelProvider(requireActivity())[PositionsViewModel::class.java]
+                viewModel.squareOffPosition(position.symbol)
+                dismiss()
+            }
+        )
+        exitBottomSheet.show(parentFragmentManager, "ExitEntirePosition")
     }
 
     private fun subscribeToUpdates() {

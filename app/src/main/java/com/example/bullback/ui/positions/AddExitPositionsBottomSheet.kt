@@ -16,6 +16,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.json.JSONArray
 import org.json.JSONObject
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
 import kotlin.math.abs
 
 class AddExitPositionsBottomSheet(
@@ -599,19 +600,15 @@ class AddExitPositionsBottomSheet(
     }
 
     private fun exitEntirePosition() {
-        // Calculate total lots in position
-        val currentLots = (abs(netQuantity) / lotSize).toInt()
-
-        // TODO: Place market order to exit entire position
-        Log.d("AddExitPositionsSheet", "Exiting entire position: $currentLots lots at market price")
-
-        Toast.makeText(
-            requireContext(),
-            "Exiting entire position of ${position.symbol}",
-            Toast.LENGTH_SHORT
-        ).show()
-
-        dismiss()
+        val exitBottomSheet = ExitPositionBottomSheetFragment(
+            isExitAll = false,
+            onConfirm = {
+                val viewModel = ViewModelProvider(requireActivity())[PositionsViewModel::class.java]
+                viewModel.squareOffPosition(position.symbol)
+                dismiss()
+            }
+        )
+        exitBottomSheet.show(parentFragmentManager, "ExitEntirePosition")
     }
 
     private fun calculateSuggestedStopLoss(): Double {

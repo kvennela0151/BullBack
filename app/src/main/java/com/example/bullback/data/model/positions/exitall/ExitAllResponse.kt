@@ -61,5 +61,5 @@ data class SquareOffRequest(
     val mode: String,
 
     @SerializedName("symbols")
-    val symbols: List<String>
+    val symbols: List<String>?
 )
